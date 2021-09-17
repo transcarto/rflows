@@ -1,0 +1,98 @@
+---
+title: "FAIRE DES CARTES DE FLUX DANS R"
+author: "BAHOKEN F.. & LAMBERT N."
+date: "2021"
+output:
+  rmdformats::readthedown
+link_citations: true
+  
+---
+
+**Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.**
+
+# Les données
+
+Les données utilisées ici ....
+
+# Les packages
+
+```{r, eval = FALSE, message = FALSE, warning = FALSE}
+install.packages(sf)
+install.packages(mapsf)
+```
+
+```{r, eval = FALSE, message = FALSE, warning = FALSE}
+library("sf")
+library("mapsf")
+```
+
+# Import et mise en forme des données
+
+```{r, eval = FALSE, message = FALSE, warning = FALSE}
+countries <- st_read("data/geom/countries.gpkg")
+graticule <- st_read("data/geom/graticule.gpkg")
+bbox <- st_read("data/geom/bbox.gpkg")
+migr <- read.csv("data/fij/migr2019_T.csv")
+
+crs <- "+proj=aeqd +lat_0=90 +lon_0=50 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs "
+countries <- st_transform(x = countries, crs = crs)
+graticule <- st_transform(x = graticule, crs = crs)
+bbox <- st_transform(x = bbox, crs = crs)
+land <- st_union(countries)
+```
+
+Template cartographique
+
+
+```{r, eval = FALSE, message = FALSE, warning = FALSE}
+template = function(title, file){
+  
+credit = "Françoise Bahoken & Nicolas Lambert, 2021\nSource: United Nations, Department of Economic and Social Affairs, Population Division (2019)"
+theme = mf_theme(x = "default", bg = "white", tab = FALSE, pos = "center", line = 1.5, inner = FALSE, fg = "black", mar = c(0,0, 1.5, 0), cex = 2)
+  
+  mf_export(
+  countries,
+  export = "png",
+  width = 1000,
+  height = 1000,
+  filename = file,
+  res = 96,
+  theme = theme
+)
+mf_map(bbox, col = "#d5ebf2",border = NA, lwd = 0.5, add = TRUE)
+mf_map(graticule, col = "white", lwd = 0.5, add = TRUE)
+mf_map(countries, col = "#baaba2",border = "white", lwd = 0.5, add = TRUE)
+mf_map(land, col = NA,border = "#317691", lwd = 0.5, add = TRUE)
+mf_credits(
+  txt = credit,
+  pos = "bottomright",
+  col = "#1a2640",
+  cex = 0.7,
+  font = 3,
+  bg = NA
+)
+mf_title(title)
+}
+```
+
+```{r, eval = FALSE, message = FALSE, warning = FALSE}
+template("Template cartographique", "maps/template.png")
+dev.off()
+```
+
+<img src = "maps/template.png"></img>
+
+# L'effet Spaghetti
+
+```{r, eval = FALSE, message = FALSE, warning = FALSE}
+links <- mf_get_links(x = countries, df = migr, x_id = "adm0_a3_is", df_id = c("i", "j"))
+```
+
+
+```{r, eval = FALSE, message = FALSE, warning = FALSE}
+template("L'effet Spaghetti ", "maps/spaghetti.png")
+mf_map(links, col = "#FF000060", lwd = 0.3, add = TRUE)
+dev.off()
+```
+
+<img src = "maps/spaghetti.png"></img>
