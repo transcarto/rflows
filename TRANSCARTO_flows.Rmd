@@ -32,10 +32,10 @@ library("mapsf")
 # Import et mise en forme des données
 
 ```{r, eval = FALSE, message = FALSE, warning = FALSE}
-countries <- st_read("data/geom/countries.gpkg")
-graticule <- st_read("data/geom/graticule.gpkg")
-bbox <- st_read("data/geom/bbox.gpkg")
-migr <- read.csv("data/fij/migr2019_T.csv")
+countries <- st_read("world/data/geom/countries.gpkg")
+graticule <- st_read("world/data/geom/graticule.gpkg")
+bbox <- st_read("world/data/geom/bbox.gpkg")
+migr <- read.csv("world/data/fij/migr2019_T.csv")
 
 crs <- "+proj=aeqd +lat_0=90 +lon_0=50 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs "
 countries <- st_transform(x = countries, crs = crs)
