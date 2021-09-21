@@ -101,7 +101,7 @@ tmp <- tmp[,c("un_a3","adm0_a3_is","name_long","geometry")]
 world <- world[!world$name_long %in% tiny,]
 world <- rbind(world,tmp)
 
-# Westren Sahara
+# Western Sahara
 
 world[world$name_long=="Western Sahara","adm0_a3_is"] <- "ESH"
 
