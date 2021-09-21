@@ -121,3 +121,80 @@ for (index in 1:21){
 }
 
 
+
+
+#----------------------------
+# (II) Compute flows margins indicators (on i) 
+# for choropleth flowmapping
+#----------------------------
+
+
+setwd("./data/world/fij")
+
+list.files() # 21 files
+
+
+file=list.files(pattern = "*.csv")
+
+
+for (index in 1:21) {
+  
+  flow<- read.csv2(file[index],
+                   header=TRUE,sep=",",
+                   stringsAsFactors=FALSE,
+                   encoding="UTF-8",dec=".", check.names=FALSE)
+  
+  # Oi : marginal sum of the place of origin
+  #----------------------------
+  tabOi<-flow %>%
+    group_by(i)%>%
+    summarise(Oi = sum(fij),count_Oi = n())
+  
+  # Di : marginal sum of the place of destination
+  #----------------------------
+  tabDj<-flow %>%
+    group_by(j)%>%
+    summarise(Dj = sum(fij),count_Dj = n())
+  
+  colnames(tabDj)<-c("i", "Dj","count_Dj")
+  
+  as.data.frame(tabOi)
+  as.data.frame(tabDj)
+  
+  # Margin table
+  #----------------------------
+  tabOiDj<-merge(tabOi,tabDj,
+                 by=c("i"), 
+                 all.X=TRUE,all.Y=TRUE)
+  
+  # Add Asymetry
+  #----------------------------
+  tabOiDj <- tabOiDj %>%
+    mutate (Vol=Oi+Dj, Bal=Oi-Dj, Asy=Bal/Vol)
+  
+  str(tabOiDj)
+  
+  tabOiDj$i<-as.character(tabOiDj$i)
+  tabOiDj$Oi<-as.numeric(tabOiDj$Oi)
+  tabOiDj$Dj<-as.numeric(tabOiDj$Dj)
+  tabOiDj$Vol<-as.numeric(tabOiDj$Vol)
+  tabOiDj$Bal<-as.numeric(tabOiDj$Bal)
+  tabOiDj$Asy<-as.numeric(tabOiDj$Asy)
+  
+  
+  head(tabOiDj)
+  
+  # Export
+  #----------------------------
+  
+  if(!dir.exists("D:/R/github/transcarto/rflows/data/world/fij_OiDj"))
+  {dir.create("D:/R/github/transcarto/rflows/data/world/fij_OiDj")}
+  
+  filename_tabOiDj <- paste0("D:/R/github/transcarto/rflows/data/world/fij_OiDj/OiDj_",file[index])
+  write.csv2(tabOiDj,filename_tabOiDj)
+  
+  
+}
+
+
+
