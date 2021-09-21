@@ -136,12 +136,41 @@ subregions <- subregions[,c("Code2","Label2")]
 st_geometry(subregions) <- st_cast(subregions$geometry, "MULTIPOLYGON")
 colnames(subregions) <- c("id","label","geometry")
 
+# Centroïd extraction
+
+countries <- st_read("data/world/geom/countries.gpkg")
+bkg<-countries
+pt_centroid<-bkg %>% sf::st_centroid()
+pts<-st_coordinates(pt_centroid)
+XYcountries<-cbind(pts,pt_centroid)
+
+regions <- st_read("data/world/geom/regions.gpkg")
+bkg<-regions
+pt_centroid<-bkg %>% sf::st_centroid()
+pts<-st_coordinates(pt_centroid)
+XYregions<-cbind(pts,pt_centroid)
+
+subregions <- st_read("data/world/geom/subregions.gpkg")
+bkg<-subregions
+pt_centroid<-bkg %>% sf::st_centroid()
+pts<-st_coordinates(pt_centroid)
+XYsubregions<-cbind(pts,pt_centroid)
+
+
 # Export geopackage
 
 if(!dir.exists("data/geom")){dir.create("data/geom")}
-st_write(world,"data/geom/countries.gpkg")
-st_write(regions,"data/geom/regions.gpkg")
-st_write(subregions,"data/geom/subregions.gpkg")
+st_write(world,"data/world/geom/countries.gpkg")
+st_write(regions,"data/world/geom/regions.gpkg")
+st_write(subregions,"data/world/geom/subregions.gpkg")
+
+
+# Export geopackage points
+
+st_write(XYcountries,"data/world/geom/XYsubregions.gpkg")
+st_write(XYregions,"data/world/geom/XYregions.gpkg")
+st_write(XYsubregions,"data/world/geom/XYcountries.gpkg")
+
 
 # Other geometries
 
