@@ -17,25 +17,25 @@ Les données utilisées ici ....
 # Les packages
 
 ```{r, eval = FALSE, message = FALSE, warning = FALSE}
-install.packages(sf)
-install.packages(mapsf)
-install.packages(devtools)
-library(devtools)
+install.packages("sf")
+install.packages("mapsf")
+install.packages("remotes")
+library(remotes)
 install_github("riatelab/mapsf")
 ```
 
-```{r, eval = FALSE, message = FALSE, warning = FALSE}
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
 library("sf")
 library("mapsf")
 ```
 
 # Import et mise en forme des données
 
-```{r, eval = FALSE, message = FALSE, warning = FALSE}
-countries <- st_read("world/data/geom/countries.gpkg")
-graticule <- st_read("world/data/geom/graticule.gpkg")
-bbox <- st_read("world/data/geom/bbox.gpkg")
-migr <- read.csv("world/data/fij/migr2019_T.csv")
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
+countries <- st_read("data/world/geom/countries.gpkg")
+graticule <- st_read("data/world/geom/graticule.gpkg")
+bbox <- st_read("data/world/geom/bbox.gpkg")
+migr <- read.csv("data/world/fij/migr2019_T.csv")
 
 crs <- "+proj=aeqd +lat_0=90 +lon_0=50 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs "
 countries <- st_transform(x = countries, crs = crs)
@@ -47,94 +47,59 @@ land <- st_union(countries)
 Template cartographique
 
 
-```{r, eval = FALSE, message = FALSE, warning = FALSE}
-  credit = "Françoise Bahoken & Nicolas Lambert, 2021\nSource: United Nations, Department of Economic and Social Affairs, Population Division (2019)"
-  theme = mf_theme(x = "default", bg = "white", tab = FALSE, pos = "center", line = 3,
-                   inner = TRUE, fg = "#9F2042", mar = c(0,0, 0, 0), cex = 1.5)
-```
-
-```{r, eval = FALSE, message = FALSE, warning = FALSE}
-  title = "Map Template"
-  file = "maps/template.png"
-    mf_export(
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+template = function(title, file){
+  
+  credit = paste0("Françoise Bahoken & Nicolas Lambert, 2021\n",
+                  "Source: United Nations, Department of Economic\n",
+                  "and Social Affairs, Population Division (2019)")
+  theme = mf_theme(x = "default", bg = "white", tab = FALSE, 
+                   pos = "center", line = 2, inner = FALSE, 
+                   fg = "#9F204270", mar = c(0,0, 2, 0),cex = 1.9)
+  mf_export(
     countries,
     export = "png",
     width = 1000,
-    height = 1000,
     filename = file,
     res = 96,
-    theme = theme
+    theme = theme, 
+    expandBB = c(-.02,0,-.02,0)
   )
   mf_map(bbox, col = "#d5ebf2",border = NA, lwd = 0.5, add = TRUE)
   mf_map(graticule, col = "white", lwd = 0.5, add = TRUE)
   mf_map(countries, col = "#baaba2",border = "white", lwd = 0.5, add = TRUE)
-  mf_map(land, col = NA,border = "#607c9e", lwd = 1, add = TRUE)
+  mf_map(land, col = NA,border = "#317691", lwd = 0.5, add = TRUE)
+    # mf_map(links, col = NA,border = "#317691", lwd = 0.5, add = TRUE)
   mf_credits(
     txt = credit,
     pos = "bottomright",
     col = "#1a2640",
     cex = 0.7,
     font = 3,
-    bg = NA
+    bg = "#ffffff30"
   )
   mf_title(title)
-  dev.off()
+}
+```
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
+template("Template cartographique", "maps/template.png")
+dev.off()
 ```
 
 <img src = "maps/template.png"></img>
 
 # L'effet Spaghetti
 
-```{r, eval = FALSE, message = FALSE, warning = FALSE}
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
 links <- mf_get_links(x = countries, df = migr, x_id = "adm0_a3_is", df_id = c("i", "j"))
 ```
 
 
-```{r, eval = FALSE, message = FALSE, warning = FALSE}
-  title = "L'effet Spaghetti"
-  file = "maps/spaghetti.png"
-  
-  mf_export(
-    countries,
-    export = "png",
-    width = 1000,
-    height = 1000,
-    filename = file,
-    res = 96,
-    theme = theme
-  )
-  mf_map(bbox, col = "#d5ebf2",border = NA, lwd = 0.5, add = TRUE)
-  mf_map(graticule, col = "white", lwd = 0.5, add = TRUE)
-  mf_map(countries, col = "#baaba2",border = "white", lwd = 0.5, add = TRUE)
-  mf_map(links, col = "#9F204270", lwd = 1, add=TRUE)
-    mf_map(land, col = NA,border = "white", lwd = 0.5, add = TRUE)
-  mf_credits(
-    txt = credit,
-    pos = "bottomright",
-    col = "#1a2640",
-    cex = 0.7,
-    font = 3,
-    bg = NA
-  )
-
-  mf_title(title)
-
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
+template("L'effet Spaghetti ", "maps/spaghetti.png")
+mf_map(links, col = "#9F204270", add=TRUE)
 dev.off()
 ```
 
 <img src = "maps/spaghetti.png"></img>
-
-#  Migration Stocks IN a targeted coutry
-
-```{r, eval = FALSE, message = FALSE, warning = FALSE}
-    iso <- "IND"
-    migr <- read.csv("data/fij/migr2019_T.csv")
-    title <- paste0("Migrants in ",iso," in 2019")
-    legtitle <- "Number of migrants\nby country of origin"
-    outputfile <- "maps/fig2.png"
-    col1 <- "#e6392e"
-    col2 <- "#fc8665"
-    fixmax <- 200000
-    inches <- 0.1
-
-```
