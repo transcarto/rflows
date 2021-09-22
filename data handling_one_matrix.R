@@ -40,7 +40,7 @@ flow$fij<-as.numeric(flow$fij)
 #----------------------------
 # (I) Compute flows types indicators (on fij) 
 # for OD flowmapping
-#----------------------------#
+#----------------------------
 
 
 
@@ -136,7 +136,6 @@ if(!dir.exists("./data/world/fij_indic"))
 {dir.create("./data/world/fij_indic")}
 
 st_write(flow_indic,"./data/world/fij_indic/fij_indic_migr2019.csv")
-
 
 
 
