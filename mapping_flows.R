@@ -178,5 +178,114 @@ dev.off()
 
 
 
+#----------------------
+# MAP (2) bilateral Volum
+#----------------------
+
+# creating a single vector list of codes
+liste<-countries%>%select(adm0_a3_is)
+liste<-as.data.frame(liste$adm0_a3_is)
+
+# Square the matrix
+
+tabflow<-flowcarre(tab=flow,
+                   liste=liste,
+                   origin = "i", dest="j",valflow="fij",
+                   format="L",
+                   diagonale = TRUE,
+                   empty.sq = FALSE
+)
+
+
+colnames(tabflow)<-c("i", "j", "fij")
+
+tabflow$i<-as.character(tabflow$i)
+tabflow$j<-as.character(tabflow$j)
+tabflow$fij<-as.numeric(tabflow$fij)
+
+# compute gross flows
+
+flow_vol<-flowtype(tabflow, origin ="i",destination="j",fij="Fij", 
+                   format="L",x="bivolum")
+
+colnames(flow_vol)<-c("i", "j", "fij")
+
+# Flowmap gross flows up to mean flows
+#--------------------------
+
+
+# criterion selection
+Q98<-(quantile(flow_vol$fij, 0.98)) # 5% of the most important migrations
+
+max<-(max(flow_vol$fij))
+
+
+# Flowmapping 
+
+source <- "United Nations, Department of Economic and Social Affairs, Population Division (2019)"
+authors <- "Françoise Bahoken & Nicolas Lambert, 2021"
+
+# Graphic parameters
+par(mar=c(0,0,1,0))
+
+sizes <- getFigDim(x = countries, width = 1500,mar = c(0,0,0,0), res = 150)
+png("maps/flowvol_2percent.png", width = sizes[1], height = sizes[2], res = 150)
+
+# Overlay a spatial background 
+par(bg = "NA")
+
+plot(st_geometry(countries), col=NA, border=NA)
+
+plot(st_geometry(bbox), col="#d5ebf2", border=NA, add=T)
+plot(st_geometry(graticule), col = "white",lwd=1, add=T)
+plot(st_geometry(countries), col="#e3d0c1", border = "white", add=T)
+plot(st_geometry(land), col=NA, border = "#317691", lwd = 1, add=T)
+
+x <- -16300000 ; y <- 12250000
+
+flow<-flow_vol
+
+flowmap(tab=flow,
+        origin.f = "i",
+        destination.f = "j",
+        nodes= pt,
+        code="adm0_a3_is",
+        nodes.X="X",
+        nodes.Y="Y",
+        filter=T,
+        threshold=Q98,  # plot flow value > mean value
+        taille=15,     
+        a.head=0,      #pas de tête de flèche
+        a.length = 0.09,
+        a.col="#636363",
+        add=TRUE)
+
+
+#cartography
+library(cartography)
+
+legendPropLines(pos="bottomright",
+                title.txt="Number of migrants",
+                title.cex=1,   
+                cex=0.8,
+                values.cex= 0.7,     
+                var=c(Q98,max),  
+                lwd=15,               
+                frame = FALSE,
+                col="#636363",
+                values.rnd = 0
+)
+
+
+layoutLayer(title = "2% du volume de flux de migrants les plus importants",
+            author <- authors,
+            sources <- source,
+            tabtitle = T,
+            frame = TRUE,
+            col = "#636363") # coltitle ="#636363"
+
+dev.off()
+
+
 
 
