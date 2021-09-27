@@ -12,33 +12,38 @@ link_citations: true
 
 # Les données
 
-Les données utilisées ici ....
+Jeu de données sur les migrations internationales. Migration Stock at subregional level, 2019 Source : United Nations, Department of Economic and Social Affairs, Population Division (2019). [Voir](https://www.un.org/en/development/desa/population/migration/data/estimates2/estimates19.asp)
+
+<img src ="img/excel.png"></png>
 
 # Les packages
 
 ```{r, eval = FALSE, message = FALSE, warning = FALSE}
 install.packages("sf")
-install.packages("mapsf")
 install.packages("remotes")
 library(remotes)
 install_github("riatelab/mapsf")
+install_github("tributetotobler/ttt")
 ```
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
 library("sf")
 library("mapsf")
+library("ttt")
 ```
 
 # Import et mise en forme des données
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 countries <- st_read("data/world/geom/countries.gpkg")
+subregions <- st_read("data/world/geom/subregions.gpkg")
 graticule <- st_read("data/world/geom/graticule.gpkg")
 bbox <- st_read("data/world/geom/bbox.gpkg")
 migr <- read.csv("data/world/fij/migr2019_T.csv")
 
 crs <- "+proj=aeqd +lat_0=90 +lon_0=50 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs "
 countries <- st_transform(x = countries, crs = crs)
+subregions <- st_transform(x = subregions, crs = crs)
 graticule <- st_transform(x = graticule, crs = crs)
 bbox <- st_transform(x = bbox, crs = crs)
 land <- st_union(countries)
@@ -48,13 +53,26 @@ Template cartographique
 
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
-col = "#9F204280"
+col = "#ffc524"
 credit = paste0("Françoise Bahoken & Nicolas Lambert, 2021\n",
                   "Source: United Nations, Department of Economic\n",
                   "and Social Affairs, Population Division (2019)")
-theme = mf_theme(x = "default", bg = "white", tab = FALSE, 
-                   pos = "center", line = 2, inner = FALSE, 
-                   fg = "#9F204270", mar = c(0,0, 2, 0),cex = 1.9)
+# theme = mf_theme(x = "default", bg = "white", tab = FALSE, 
+#                    pos = "center", line = 2, inner = FALSE, 
+#                    fg = "#9F204270", mar = c(0,0, 2, 0),cex = 1.9)
+
+theme <- mf_theme(
+  x = "default",
+  bg = "#3b3b3b", 
+  fg = "#ffc524", 
+  mar = c(0,0, 2, 0),
+  tab = TRUE,
+  pos = "left", 
+  inner = TRUE, 
+  line = 2, 
+  cex = 1.9, 
+  font = 3
+  )
 
 template = function(title, file){
 
@@ -67,10 +85,9 @@ template = function(title, file){
     theme = theme, 
     expandBB = c(-.02,0,-.02,0)
   )
-  mf_map(bbox, col = "#d5ebf2",border = NA, lwd = 0.5, add = TRUE)
-  mf_map(graticule, col = "white", lwd = 0.5, add = TRUE)
-  mf_map(countries, col = "#baaba2",border = "white", lwd = 0.5, add = TRUE)
-  mf_map(land, col = NA,border = "#317691", lwd = 0.5, add = TRUE)
+  mf_map(bbox, col = "#3b3b3b",border = NA, lwd = 0.5, add = TRUE)
+  mf_map(graticule, col = "#FFFFFF50", lwd = 0.5, add = TRUE)
+  mf_map(countries, col = "#4e4f4f",border = "#3b3b3b", lwd = 0.5, add = TRUE)
     # mf_map(links, col = NA,border = "#317691", lwd = 0.5, add = TRUE)
   mf_credits(
     txt = credit,
@@ -101,6 +118,7 @@ links <- mf_get_links(x = countries, df = migr, x_id = "adm0_a3_is", df_id = c("
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 template("L'effet Spaghetti ", "maps/spaghetti.png")
 mf_map(links, col = col, add=TRUE)
+mf_map(land, col = NA, border = "#3b3b3b", add=TRUE)
 dev.off()
 ```
 
@@ -152,10 +170,11 @@ Une premiere carte simple
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 template(paste0("Origine des personnes migrantes vivant en ",label," en 2019"), "maps/prop1.png")
-mf_map(countr[countr$id == ISO3,], col = "#6b274f", border = "white", add = TRUE)
-mf_map(countr[countr$id != ISO3,], var = "fij", col = "#c75b9a", border = "white", type = "prop",
-       inches = 0.3, leg_title_cex = 1.2, leg_val_cex   = 0.8,
+#mf_map(countr[countr$id == ISO3,], col = col, border = "red", lwd = 2, add = TRUE)
+mf_map(countr[countr$id != ISO3,], var = "fij", col = col, border = "white", type = "prop",
+       inches = 0.3, leg_title_cex = 1.2, leg_val_cex   = 0.8, leg_pos = "bottomleft",
        leg_title = "Nombre de personnes")
+mf_map(countr[countr$id == ISO3,], col = NA, border = "#e36019", lwd = 2, add = TRUE)
 dev.off()
 ```
 
@@ -171,10 +190,10 @@ links = links[links$id != ISO3,]
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 template(paste0("Origine des personnes migrantes vivant en ",label," en 2019"), "maps/flows1.png")
-mf_map(links, var = "fij", col = "#c75b9a", type = "prop",
+mf_map(links, var = "fij", col = col, type = "prop",
        inches = 4, leg_title_cex = 1.2, leg_val_cex   = 0.8,
        leg_title = "Nombre de personnes")
-mf_map(countr[countr$id == ISO3,], col = "#6b274f", border = "white", add = TRUE)
+mf_map(countr[countr$id == ISO3,], col = NA, border = "#e36019", lwd = 2, add = TRUE)
 dev.off()
 ```
 
@@ -185,9 +204,170 @@ Une carte un peu plus sophistiquée
 
 > https://analytics.huma-num.fr/Nicolas.Lambert/migrexplorer/
 
-
 # Flowmapper
 
-Carte polaire
-Puis passer au globe....
+flowmapper() est une fonction du package ttt (en cours de développement). 
 
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
+library(ttt)
+```
+
+La fonction ttt_flowmapper() prends plusieurs arguements :
+
+...
+
+Les données
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
+migr <- read.csv("data/world/subregions/migrantstocks2019.csv")
+threshold <- 1500
+migr <- migr[migr$fij >= threshold,]
+```
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+knitr::kable(migr[c(0:10),], row.names = F, digits = 1)
+```
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
+flows <- ttt_flowmapper(
+  x = subregions,
+  xid = "id",
+  df = migr,
+  dfid = c("i","j"),
+  dfvar = "fij",
+  plot = FALSE
+)
+```
+
+$inks
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
+template("ttt_flowmapper$links", "maps/ttt_links.png")
+mf_map(subregions, col = "#4e4f4f",border = "#3b3b3b", lwd = 0.5, add = TRUE)
+mf_map(flows$links, col = col, lwd = 3, add = TRUE)
+dev.off()
+```
+
+<img src = "maps/ttt_links.png"></img>
+
+$circles
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
+template("ttt_flowmapper$circles", "maps/ttt_circles.png")
+mf_map(subregions, col = "#4e4f4f",border = "#3b3b3b", lwd = 0.5, add = TRUE)
+mf_map(flows$circles, col = col, add = TRUE)
+dev.off()
+```
+
+<img src = "maps/ttt_circles.png"></img>
+
+$fleches
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
+template("ttt_flowmapper$flows", "maps/ttt_flows.png")
+mf_map(subregions, col = "#4e4f4f",border = "#3b3b3b", lwd = 0.5, add = TRUE)
+mf_map(flows$flows, col = col, add = TRUE)
+dev.off()
+```
+
+
+Visualisation par défaut
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
+template("ttt_flowmapper$flows", "maps/ttt_flows.png")
+mf_map(subregions, col = "#4e4f4f",border = "#3b3b3b", lwd = 0.5, add = TRUE)
+ttt_flowmapper(
+ x = subregions,
+ xid = "id",
+type = "arrows",
+ df = migr,
+ dfid = c("i","j"),
+ dfvar = "fij", 
+ col = col,
+ border = "#424242",
+  border2 = col,
+add=TRUE
+)
+dev.off()
+```
+
+<img src = "maps/ttt_flows.png"></img>
+
+Interactions (type = "rect")
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
+migr2 <- data.frame(i = integer(),j= integer(),fij = integer())
+
+for (k in 1:length(migr$i)){
+  val1 <- migr$fij[k]
+  val2 <- migr[migr$i == migr$j[k] & migr$j == migr$i[k],"fij"]
+  val <- sum(val1,val2)
+  idi =  migr$i[k]
+  idj =  migr$j[k]  
+  test <- length(migr2[(migr2$i == idi & migr2$j == idj) | (migr2$i == idj & migr2$j == idi),"fij"])
+  if  (test == 0){migr2 <- rbind(migr2, data.frame(i = idi, j = idj, fij = val))}
+}
+migr2 <- migr2[migr2$i != migr2$j,] 
+```
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+head(migr2)
+```
+
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
+template("tInteractions", "maps/ttt_interactions.png")
+c <- ttt_flowmapper(
+ x = subregions,
+ xid = "id",
+ size = "thickness",
+ type = "rect",
+ df = migr2,
+ dfid = c("i","j"),
+ dfvar = "fij",
+ col = col,
+border = "#424242",
+  border2 = col,
+ add=TRUE
+)
+dev.off()
+```
+
+<img src = "maps/ttt_interactions.png"></img>
+
+Combiner flux intra et flux inter
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
+intra <- migr[migr$i == migr$j,]
+intra <- intra[,c("i","fij")]
+colnames(intra) <- c("id","nb")
+knitr::kable(intra, row.names = F, digits = 1)
+```
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
+template("Flux inter et flux intra", "maps/interintra.png")
+flows <- ttt_flowmapper(
+ x = subregions,
+ xid = "id",
+ df = migr,
+ dfid = c("i","j"),
+ dfvar = "fij",
+ size = "thickness",
+ type = "arrows",
+ decreasing = FALSE,
+ add = TRUE,
+ lwd = 1,
+ col = col,
+ border = "#424242",
+ k = NULL,
+ k2 = 60,
+ df2 = intra,
+ df2id = "id",
+ df2var = "nb",
+ col2 = col,
+ border2 = "#424242"
+)
+dev.off()
+```
+
+<img src = "maps/interintra.png"></img>
