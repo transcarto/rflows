@@ -157,9 +157,15 @@ pts<-st_coordinates(pt_centroid)
 XYsubregions<-cbind(pts,pt_centroid)
 
 
-# Export geopackage
+# Export geopackage => Attention a l'arborescence
 
 if(!dir.exists("data/geom")){dir.create("data/geom")}
+st_write(world,"data/geom/countries.gpkg")
+st_write(regions,"data/geom/regions.gpkg")
+st_write(subregions,"data/geom/subregions.gpkg")
+
+
+if(!dir.exists("data/world/geom")){dir.create("data/geom")}
 st_write(world,"data/world/geom/countries.gpkg")
 st_write(regions,"data/world/geom/regions.gpkg")
 st_write(subregions,"data/world/geom/subregions.gpkg")

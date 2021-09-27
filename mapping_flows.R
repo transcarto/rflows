@@ -210,12 +210,12 @@ flow_vol<-flowtype(tabflow, origin ="i",destination="j",fij="Fij",
 
 colnames(flow_vol)<-c("i", "j", "fij")
 
-# Flowmap gross flows up to mean flows
+# Flowmap gross flows : the top 2% plus important
 #--------------------------
 
 
 # criterion selection
-Q98<-(quantile(flow_vol$fij, 0.98)) # 5% of the most important migrations
+Q98<-(quantile(flow_vol$fij, 0.98)) # 2% of the most important flows
 
 max<-(max(flow_vol$fij))
 
@@ -285,7 +285,6 @@ layoutLayer(title = "2% du volume de flux de migrants les plus importants",
             col = "#636363") # coltitle ="#636363"
 
 dev.off()
-
 
 
 
