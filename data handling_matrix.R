@@ -3,11 +3,13 @@
 # Computes bilateral flows (Fij) and marginal (on i) flow indicators
 #----------------------------
 
+
 #rm(list=ls())
 
-# Compute flow types for one matrix
+# Compute flow types for several matrix
 
 setwd("D:/R/github/transcarto/rflows")
+
 
 # Packages
 #----------------------------
@@ -23,10 +25,21 @@ library("cartograflow")
 countries <- st_read("./data/world/geom/countries.gpkg")
 
 #flows
-flow<- read.csv2("./data/world/fij/migr2019_T.csv",
-                 header=TRUE,sep=",",
-                 stringsAsFactors=FALSE,
-                 encoding="UTF-8",dec=".", check.names=FALSE)
+
+setwd("./data/world/fij")
+
+list.files() # 21 files
+
+file=list.files(pattern = "*.csv")
+
+
+for (index in 1:21){
+  
+flow<- read.csv2(file[index],
+                   header=TRUE,sep=",",
+                   stringsAsFactors=FALSE,
+                   encoding="UTF-8",dec=".", check.names=FALSE)
+  
 
 # Variable typing
 countries$adm0_a3_is<-as.character(countries$adm0_a3_is)
@@ -40,7 +53,6 @@ flow$fij<-as.numeric(flow$fij)
 # (I) Compute flows types indicators (on fij) 
 # for OD flowmapping
 #----------------------------
-
 
 
 # 1) Close and square the matrix
@@ -59,48 +71,19 @@ tabflow<-flowcarre(tab=flow,
                    empty.sq = FALSE
 )
 
-colnames(tabflow)<-c("i", "j", "fij")
-
-tabflow$i<-as.character(tabflow$i)
-tabflow$j<-as.character(tabflow$j)
-tabflow$fij<-as.numeric(tabflow$fij)
+colnames(tabflow)<-c("i", "j", "Fij")
 
 
 
-# (2) Compute Gross and net flows as Tobler's 
+# 2) Compute all bilateral flows indicators (on Fij) 
 #----------------------------
 
-
-# Compute bilateral flow volum : FSij
-flow_vol<-flowtype(tabflow, origin ="i",destination="j",fij="Fij", 
-                   format="L",x="bivolum")
-
-# Compute bilateral flow balance : FBij
-flow_net<-flowtype(tabflow, origin ="i",destination="j",fij="Fij", 
-                   format="L", x="bibal")
-
-
-
-# (3) Compute asymmetry of bilateral flows : FAij
+# Compute only bilateral flow volum : FSij
 #----------------------------
+#flow_vol<-flowtype(tabflow, origin ="i",destination="j",fij="Fij", format="L", "bivolum")
 
-flow_asy<-flowtype(tabflow, origin ="i",destination="j",fij="Fij", 
-                   format="L", x="biasym")
-
-
-
-#suppress NA cells due to zero division (eg for flow_asy)
-
-for (i in 1:nrow(flow_asy))
-  for (j in 1:ncol(flow_asy))
-  {if (is.na.data.frame(flow_asy[i,j])==TRUE) {flow_asy[i,j]<-0}
-  }
-
-
-#----------------------------
-# Compute all 9 types of bilateral flows indicators (on Fij)
-# (and supress NA)
-#---------------------------
+# Compute all 9 types of bilateral flows (and supress NA)
+#------------------------
 # Fij : observed flow 
 # Fji : reverse flow 
 # FSij : bilateral volum flow
@@ -108,14 +91,13 @@ for (i in 1:nrow(flow_asy))
 # FAij : asymetry of bilateralflow
 # minFij : bilateral - cooperation - ie. symetry as min of (Fij, Fji)
 # maxFij : bilateral - competition - ie. symetry as max of (Fij, Fji)
-# rangeFij : bilateral range as (maxFij - minFij)# FDij : bilateral disymetry as (bilateral volum / bilateral range)
+# rangeFij : bilateral range as (maxFij - minFij)
+# FDij : bilateral disymetry as (bilateral volum / bilateral range)
 
-flow_indic<-flowtype(tabflow, origin ="i",destination="j",fij="fij",
+flow_indic<-flowtype(tabflow, origin ="i",destination="j",fij="Fij",
                      format="L", x="alltypes")
 
 # supress NA cells
-
-dim(flow_indic)
 
 for (i in 1:nrow(flow_indic))
   for (j in 1:ncol(flow_indic))
@@ -127,12 +109,17 @@ flow_indic$j<-as.character(flow_indic$j)
 
 head(flow_indic)
 
+
 # Export 
+#----------------------------
+if(!dir.exists("D:/R/github/transcarto/rflows/data/world/fij_indic"))
+  {dir.create("D:/R/github/transcarto/rflows/data/world/fij_indic")}
 
-if(!dir.exists("./data/world/fij_indic"))
-{dir.create("./data/world/fij_indic")}
+filename_tabflow <- paste0("D:/R/github/transcarto/rflows/data/world/fij_indic/fij_indic_",file[index])
+write.csv2(flow_indic,filename_tabflow)
 
-st_write(flow_indic,"./data/world/fij_indic/fij_indic_migr2019.csv")
+}
+
 
 
 
@@ -141,11 +128,36 @@ st_write(flow_indic,"./data/world/fij_indic/fij_indic_migr2019.csv")
 # for choropleth flowmapping
 #----------------------------
 
-flow<- read.csv2("./data/world/fij/migr2019_T.csv",
-                 header=TRUE,sep=",",
-                 stringsAsFactors=FALSE,
-                 encoding="UTF-8",dec=".", check.names=FALSE)
 
+rm(list=ls())
+
+# Compute flow types for several matrix
+
+setwd("D:/R/github/transcarto/rflows")
+
+
+# Packages
+#----------------------------
+
+library("dplyr")
+library("cartograflow")
+
+
+setwd("./data/world/fij")
+
+list.files() # 21 files
+
+
+file=list.files(pattern = "*.csv")
+
+
+
+for (index in 1:21) {
+  
+flow<- read.csv2(file[index],
+                   header=TRUE,sep=",",
+                   stringsAsFactors=FALSE,
+                   encoding="UTF-8",dec=".", check.names=FALSE)
 
 # Oi : marginal sum of the place of origin
 #----------------------------
@@ -164,7 +176,7 @@ colnames(tabDj)<-c("i", "Dj","count_Dj")
 as.data.frame(tabOi)
 as.data.frame(tabDj)
 
-# Margin OiDj table
+# Margin table
 #----------------------------
 tabOiDj<-merge(tabOi,tabDj,
                by=c("i"), 
@@ -185,10 +197,21 @@ tabOiDj$Bal<-as.numeric(tabOiDj$Bal)
 tabOiDj$Asy<-as.numeric(tabOiDj$Asy)
 
 
+head(tabOiDj)
+
 # Export
 #----------------------------
 
-if(!dir.exists("./data/world/fij_OiDj"))
-{dir.create("./data/world/fij_OiDj")}
+if(!dir.exists("D:/R/github/transcarto/rflows/data/world/fij_OiDj"))
+  {dir.create("D:/R/github/transcarto/rflows/data/world/fij_OiDj")}
 
-st_write(tabOiDj,"./data/world/fij_OiDj/tabOiDj_migr2019.csv")
+filename_tabOiDj <- paste0("D:/R/github/transcarto/rflows/data/world/fij_OiDj/OiDj_",file[index])
+write.csv2(tabOiDj,filename_tabOiDj)
+
+
+}
+
+
+
+
+  
