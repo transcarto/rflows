@@ -146,7 +146,7 @@ flowmap(tab=flow_vol,
 
 communes<-fdc
 
-col = "#82d477" #c291bc"
+col = "#37962a" #c291bc"
 
 credits = paste0("Bahoken Françoise & Nicolas Lambert, 2021\n",
                  "Source: IGN & INSEE, 2021")
@@ -224,7 +224,7 @@ plot(st_geometry(fdc), col="grey", border="white",lwd = 0.5, bg="white", add = T
 flowmap(tab=flow_vol,origin.f = "i", destination.f = "j",
         bkg= fdc, code="INSEE_COM",nodes.X="X", nodes.Y="Y",
         filter=T, threshold=Q95,  # plot the top 5% flow value
-        taille=20,a.head=0,a.col="#82d477", #636363 (grey)
+        taille=20,a.head=0,a.col="#37962a", #636363 (grey)
         add=TRUE
 )
 
@@ -243,7 +243,7 @@ mf_legend_pl( pos="topright",
 layoutLayer(title = "Mobilités professionnelles en Isère, 2019",
             tabtitle = T,
             frame = TRUE,
-            col = "#82d477", # coltitle ="#636363"
+            col = "#37962a", # coltitle ="#636363"
             bg=NA,
 )
 
@@ -278,13 +278,10 @@ plot(st_geometry(fdc), col=NA, border=NA)
 
 plot(st_geometry(fdc), col="grey", border="white",lwd = 0.5, bg="white", add = TRUE )
 
-#mf_map(fdc, col = NA, border = "white", lwd = 0.5, bg="white", add = TRUE)
-
-
 flowmap(tab=flow_vol,origin.f = "i", destination.f = "j",
         bkg= fdc, code="INSEE_COM",nodes.X="X", nodes.Y="Y",
         filter=T, threshold=mean,  # plot flow value > mean fij
-        taille=20,a.head=0,a.col="#82d477", #636363 (grey)
+        taille=20,a.head=0,a.col="#37962a", #636363 (grey)
         add=TRUE
 )
 
@@ -300,13 +297,10 @@ mf_legend_pl( pos="topright",
               
 )
 
-#authors<- "Bahoken Françoise & Nicolas Lambert, 2021\n"
-#sources<-"Source: IGN & INSEE/MOBPRO2019, 2021"
-
 layoutLayer(title = "Mobilités professionnelles en Isère, 2019",
             tabtitle = T,
             frame = TRUE,
-            col = "#82d477", # coltitle ="#636363"
+            col = "#37962a", # coltitle ="#636363"
             bg=NA,
 )
 
@@ -320,3 +314,65 @@ mf_credits(
 
 
 dev.off()
+
+
+
+#----------------------
+# Bilateral volume Isere on fisheye
+#----------------------
+
+fish <- st_read("D:/R/github/transcarto/rflows/data/fisheye_grenoble1.gpkg", quiet = TRUE ) 
+
+plot(st_geometry(fish), col="grey", border="white")
+
+mean<-mean(flow_vol$FSij)
+
+# plot
+
+plot.new()
+
+png("maps/isere_volflow_fish.png")
+
+par(bg = "NA")
+
+plot(st_geometry(fish), col=NA, border=NA)
+
+plot(st_geometry(fish), col="grey", border="white",lwd = 0.5, bg="white", add = TRUE )
+
+flowmap(tab=flow_vol,origin.f = "i", destination.f = "j",
+        bkg= fish, code="id",nodes.X="X", nodes.Y="Y",
+        filter=T, threshold=mean,  # plot flow value > mean fij
+        taille=20,a.head=0,a.col="#37962a", #636363 (grey)
+        add=TRUE
+)
+
+
+mf_legend_pl( pos="topright",
+              val = c(mean, Q95,Q98, max),
+              col=col,
+              lwd=15, 
+              title="Volume bilatéral de navetteurs\n (supérieur à la moyenne)",
+              title_cex=0.8,
+              val_cex= 0.8,
+              frame=F,
+              
+)
+
+layoutLayer(title = "Mobilités professionnelles en Isère, 2019\n fond fisheye Grenoble",
+            tabtitle = T,
+            frame = TRUE,
+            col = "#37962a", # coltitle ="#636363"
+            bg=NA,
+)
+
+mf_credits(
+  txt = "Bahoken Françoise & Lambert Nicolas, 2021\n Source : IGN & INSEE/MOBPRO 2019 ",
+  pos = "bottomleft",
+  col="#636363",
+  cex = 0.6,
+  font = 3,
+)
+
+
+dev.off()
+
