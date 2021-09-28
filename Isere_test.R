@@ -202,46 +202,99 @@ template("Template cartographique", "maps/template_isere_flow.png", note = "Dép
 mf_map(fdc, col = col, border = "white", lwd = 0.5, add = TRUE)
 dev.off()
 
-#-----------
-#flowmap Isere
-#-----------
 
-#graphic parameters
+#----------------------
+# 2% top flow 
+#---------------------- 
+
+
+plot.new()
+
+png("maps/isere_top5percentflow.png")
+
+par(bg = "NA")
+
+plot(st_geometry(fdc), col=NA, border=NA)
+
+plot(st_geometry(fdc), col="grey", border="white",lwd = 0.5, bg="white", add = TRUE )
+
+#mf_map(fdc, col = NA, border = "white", lwd = 0.5, bg="white", add = TRUE)
+
+
+flowmap(tab=flow_vol,origin.f = "i", destination.f = "j",
+        bkg= fdc, code="INSEE_COM",nodes.X="X", nodes.Y="Y",
+        filter=T, threshold=Q95,  # plot the top 5% flow value
+        taille=20,a.head=0,a.col="#82d477", #636363 (grey)
+        add=TRUE
+)
+
+
+mf_legend_pl( pos="topright",
+              val = c(Q95,Q98, max),
+              col=col,
+              lwd=20, 
+              title="5 % de flux les plus importants\n (ie de l'interaction totale)",
+              title_cex=0.8,
+              val_cex= 0.8,
+              frame=F,
+              
+)
+
+layoutLayer(title = "Mobilités professionnelles en Isère, 2019",
+            tabtitle = T,
+            frame = TRUE,
+            col = "#82d477", # coltitle ="#636363"
+            bg=NA,
+)
+
+mf_credits(
+  txt = "Bahoken Françoise & Lambert Nicolas, 2021\n Source : IGN & INSEE/MOBPRO 2019 ",
+  pos = "bottomleft",
+  col="#636363",
+  cex = 0.6,
+  font = 3,
+)
+
+
+dev.off()
+
+
+
+
+#----------------------
+# Bilateral volume Isere
+#----------------------
 
 
 # Overlay a spatial background 
 
 plot.new()
 
+png("maps/isere_volflow.png")
+
 par(bg = "NA")
 
-plot(st_geometry(fdc), col=NA, border=NA) #bg="#f0f0f0"
+plot(st_geometry(fdc), col=NA, border=NA)
 
-mf_map(fdc, col = NA, border = "white", lwd = 0.5, add = TRUE)
+plot(st_geometry(fdc), col="grey", border="white",lwd = 0.5, bg="white", add = TRUE )
 
-flowmap(tab=flow,
-        origin.f = "i",
-        destination.f = "j",
-        bkg= fdc, #nodes= pt
-        code="INSEE_COM",
-        nodes.X="X",
-        nodes.Y="Y",
-        filter=T,
-        threshold=Q95,  # plot flow value > mean fij
-        taille=15,     
-        a.head=1,      
-        a.length = 0.09,
-        a.col="#82d477", #636363 (grey)
+#mf_map(fdc, col = NA, border = "white", lwd = 0.5, bg="white", add = TRUE)
+
+
+flowmap(tab=flow_vol,origin.f = "i", destination.f = "j",
+        bkg= fdc, code="INSEE_COM",nodes.X="X", nodes.Y="Y",
+        filter=T, threshold=mean,  # plot flow value > mean fij
+        taille=20,a.head=0,a.col="#82d477", #636363 (grey)
         add=TRUE
 )
 
 
-mf_legend_pl( pos="bottomleft",
-              val = c(Q95,Q98, max),
+mf_legend_pl( pos="topright",
+              val = c(mean, Q95,Q98, max),
               col=col,
               lwd=15, 
-              title="Nombre de navetteurs, 2019",
-              title_cex=1.0,
+              title="Volume bilatéral de navetteurs\n (supérieur à la moyenne)",
+              title_cex=0.8,
               val_cex= 0.8,
               frame=F,
               
@@ -250,18 +303,20 @@ mf_legend_pl( pos="bottomleft",
 #authors<- "Bahoken Françoise & Nicolas Lambert, 2021\n"
 #sources<-"Source: IGN & INSEE/MOBPRO2019, 2021"
 
-layoutLayer(title = "Flux de migrants supérieurs à xxx",
-            author <- authors,
-            sources <- source,
+layoutLayer(title = "Mobilités professionnelles en Isère, 2019",
             tabtitle = T,
             frame = TRUE,
-            col = "#82d477") # coltitle ="#636363"
+            col = "#82d477", # coltitle ="#636363"
+            bg=NA,
+)
 
-
-#flowmap_1 = dotdensitymap(x = communes, var = "pop2018", onedot = onedot, radius = 300)
-
-template("Carte de flux supérieur à XX", "maps/flowmap_isere_1.png")
+mf_credits(
+  txt = "Bahoken Françoise & Lambert Nicolas, 2021\n Source : IGN & INSEE/MOBPRO 2019 ",
+  pos = "bottomleft",
+  col="#636363",
+  cex = 0.6,
+  font = 3,
+)
 
 
 dev.off()
-
