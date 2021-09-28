@@ -216,7 +216,7 @@ La fonction ttt_flowmapper() prends plusieurs arguements :
 
 ...
 
-Les données
+## Les données
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 migr <- read.csv("data/world/subregions/migrantstocks2019.csv")
@@ -239,7 +239,7 @@ flows <- ttt_flowmapper(
 )
 ```
 
-$inks
+## $inks
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 template("ttt_flowmapper$links", "maps/ttt_links.png")
@@ -250,7 +250,7 @@ dev.off()
 
 <img src = "maps/ttt_links.png"></img>
 
-$circles
+## $circles
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 template("ttt_flowmapper$circles", "maps/ttt_circles.png")
@@ -261,7 +261,7 @@ dev.off()
 
 <img src = "maps/ttt_circles.png"></img>
 
-$fleches
+## $fleches
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 template("ttt_flowmapper$flows", "maps/ttt_flows.png")
@@ -271,7 +271,7 @@ dev.off()
 ```
 
 
-Visualisation par défaut
+## Visualisation par défaut
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 template("ttt_flowmapper$flows", "maps/ttt_flows.png")
@@ -291,9 +291,38 @@ add=TRUE
 dev.off()
 ```
 
+
 <img src = "maps/ttt_flows.png"></img>
 
-Interactions (type = "rect")
+## La VV taille, c'est aussi la surface
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
+
+template("La surface des fleches", "maps/ttt_surface.png")
+mf_map(subregions, col = "#4e4f4f",border = "#3b3b3b", lwd = 0.5, add = TRUE)
+ttt_flowmapper(
+ x = subregions,
+ xid = "id",
+type = "arrows",
+size = "area",
+ df = migr,
+ dfid = c("i","j"),
+ dfvar = "fij", 
+ col = col,
+ border = "#424242",
+  border2 = col,
+add=TRUE
+)
+dev.off()
+```
+
+<img src = "maps/ttt_surface.png"></img>
+
+## Epaisseur vs Surface
+
+<img src = "maps/ttt_flows.png" width = "49%"></img><img src = "maps/ttt_surface.png" width = "49%"></img>
+
+## Interactions (type = "rect")
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 migr2 <- data.frame(i = integer(),j= integer(),fij = integer())
@@ -335,7 +364,7 @@ dev.off()
 
 <img src = "maps/ttt_interactions.png"></img>
 
-Combiner flux intra et flux inter
+## Combiner flux intra et flux inter
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 intra <- migr[migr$i == migr$j,]
