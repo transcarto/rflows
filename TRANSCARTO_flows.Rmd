@@ -39,14 +39,12 @@ Données géométriques
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 countries <- st_read("data/world/geom/countries.gpkg")
-subregions <- st_read("data/world/geom/subregions.gpkg")
 graticule <- st_read("data/world/geom/graticule.gpkg")
 bbox <- st_read("data/world/geom/bbox.gpkg")
 
 crs <-
   "+proj=aeqd +lat_0=90 +lon_0=50 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs "
 countries <- st_transform(x = countries, crs = crs)
-subregions <- st_transform(x = subregions, crs = crs)
 graticule <- st_transform(x = graticule, crs = crs)
 bbox <- st_transform(x = bbox, crs = crs)
 land <- st_union(countries)
@@ -56,7 +54,6 @@ Données attributaires
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 migr <- read.csv("data/world/fij/migr2019_T.csv")
-View(migr)
 ```
 
 Template cartographique
@@ -135,7 +132,6 @@ dev.off()
 <img src = "maps/template.png"></img>
 
 # Ce qu'on peut faire en R base & mapsf
-
 
 ## L'effet Spaghetti
 
@@ -634,10 +630,40 @@ Ces cartes, on peut les retrouver dans l'application MigrExplorer mise en ligne 
 
 ## Changer de maillage
 
+Contrairement aux cartes pays * pays, cartographier les flux au niveau régional permet de mieux percevoir la logique des mobilités internationales. Cette carte, pas très élégantes, a été réalisée et présentée par François Héron pour ses cours au Collège de France. 
+
+<img src = "img/f11.png"></img>
+
+Et si on esseyait de la reproduire en R ?
+
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 migr <- read.csv("data/world/subregions/migrantstocks2019.csv")
+subregions <- st_read("data/world/geom/subregions.gpkg") %>% st_transform(crs)
 ```
 
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
+template("Subregions", "maps/subregions.png")
+mf_map(
+  subregions,
+  col = "#4e4f4f",
+  border = col,
+  lwd = 0.5,
+  add = TRUE
+)
+mf_label(
+  x = subregions,
+  var = "label",
+  halo = TRUE,
+  bg = "#4e4f4f",
+  cex = 0.8,
+  col = col,
+  overlap = TRUE,
+  lines = FALSE
+)
+dev.off()
+```
+<img src = "maps/subregions.png"></img>
 
 # Flowmapper
 
