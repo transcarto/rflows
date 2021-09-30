@@ -40,6 +40,15 @@ background-size: cover
 class: inverse middle center 
 La rhétorique en cartographie
 
+---
+Demarer par les liens 1 lien, 2 liens, 3 liens... Bcp de liens... => Impossible. Il faut faire des choix.
+Démmarer par la phrase de Lordon
+On ne pense jamais qu'avec ses affects....
+Article carte à abbatre (mettre en lien aussi)
+Citer le texte de Migreurop avec reka, raison et affects. 
+Sur les fleches rouges, lire et racibter l'article de Vanhouten
+https://www.tandfonline.com/doi/pdf/10.1080/17450101.2019.1676031?needAccess=true
+
 
 ---
 class: middle
