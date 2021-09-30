@@ -1,0 +1,131 @@
+---
+title: "Enjeux rhétoriques"
+subtitle: "Cartes de flux"
+author: "Nicolas Lambert"
+institute: "CNRS / UMS RIATE"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    chakra: libs/remark-latest.min.js
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: true
+    css:
+      - default
+      - default-fonts 
+      - "libs/css/animate.min.css"
+      - "libs/css/lambert.css"
+      - "libs/css/lambert-font.css"
+    seal: false
+---
+
+class: title-slide-custom
+
+background-image: url(img/pop-art-arrows-set-vector-16884960.jpg)
+background-size: cover
+
+# Enjeux rhétoriques des cartes de flux
+
+## Ecole thématique TRANSCARTO, Aussois.
+
+### Nicolas Lambert, (`r Sys.Date()`) - nicolas.lambert@cnrs.fr
+
+.logo[
+<img src ="img/cnrs.gif"></img>
+]
+
+---
+class: inverse middle center 
+La rhétorique en cartographie
+
+
+---
+class: middle
+# La rhétorique en cartographie
+.center[<img src="img/fig01 - frontex-01.png" width=92%><br/>.note[Frontex...]]
+
+---
+class: middle
+# La rhétorique en cartographie
+.center[<img src="img/fig02 - cube-01.png" width=82%><br/>.note[Rhétorique]]
+
+---
+class: middle
+# La rhétorique en cartographie
+.center[<img src="img/fig03 - rats-01.png" width=92%><br/>.note[William Bunge & Gwendolyn Warren]]
+
+---
+class: inverse middle center 
+La projection
+
+---
+class: middle
+# La projection
+.center[<img src="img/projection.png" width=78%>]
+
+---
+class: inverse middle center 
+Les couleurs
+
+
+
+---
+class: inverse middle center 
+Les mots
+
+---
+class: inverse middle center 
+L'échelle
+
+---
+class: inverse middle center 
+Le maillage (MAUP)
+
+---
+class: inverse middle center 
+L'emprise
+
+
+---
+# Les précurseurs
+---
+class: center, animated, fadeIn
+# Et le numérique ?
+<br/>
+<video width="100%" controls>
+  <source src="videos/lucify1.mp4" type="video/mp4">
+</video>
+.note[La carte de Lucify (2015). Voir https://neocarto.hypotheses.org/1963]
+
+
+---
+class: center, animated, fadeIn
+# Et le numérique ?
+<br/>
+<video width="100%" controls>
+  <source src="videos/lucify2.mp4" type="video/mp4">
+</video>
+.note[La carte de Lucify (2015). Voir https://neocarto.hypotheses.org/1963]
+
+
+---
+class: clear, bottom
+
+.big[
+# MERCI
+]
+
+
+`BLOG`<br/>
+[**neocarto.hypotheses.org**](https://neocarto.hypotheses.org/)
+
+`E-MAIL`<br/>
+[**nicolas.lambert@cnrs.fr**](mailto:nicolas.lambert@cnrs.fr)
+
+`TWITTER`<br/>
+[**@neocartocnrs**](https://twitter.com/neocartocnrs)
+
+`GITHUB`<br/>
+[**github.com/neocarto**](https://github.com/neocarto)

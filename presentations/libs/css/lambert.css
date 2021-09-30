@@ -1,0 +1,299 @@
+.remark-slide-content {
+  background-color: white;
+  border-top: 35px solid #23373B;
+  border-bottom: 0px solid #23373B;
+  font-size: 20px;
+  font-weight: 300;
+  line-height: 1.5;
+  padding: 1em 2em 1em 2em
+}
+
+.title-slide .inverse .remark-slide-content {
+  background-color: #FAFAFA;
+  font-size : 50px;
+  }
+
+.note {
+  text-align : center ;
+  width:100%;
+  background-color: #EFE4C5;
+  color : #23373B;
+  font-size : 13px;
+  padding : 5px;
+}
+
+.inverse {
+  background-color: #23373B;
+  text-shadow: none;
+  color:#fff642;
+  font-size:60px;
+  }
+
+.big {
+  font-size: 40px;
+  color : #23373B;
+  background-color:white;
+  opacity  : 0.7;
+}
+
+
+.remark-slide-content > h1 {
+  font-weight: normal;
+  font-size: 23px;
+  margin-top: -53px;
+  margin-left: -00px;
+  color:white;
+  text-align : center;
+}
+
+.remark-slide-content > inverse {
+width: 112px;
+height: 47px;
+border-bottom: 1px solid black;
+position: absolute;
+}
+
+/* Removes colored bar from top of the slide resulting in a clear slide */
+.clear{
+  border-top: 0px solid #FAFAFA;
+}
+
+.remark-slide-content > h2, h3, h4 {
+  padding-top: -15px;
+  padding-bottom: 00px;
+  color: #1A292C;
+  text-shadow: none;
+  font-weight: 400;
+  text-align: left;
+  margin-left: 00px;
+  margin-bottom: -10px;
+}
+
+.remark-slide-content > h2, .pull-left > h2, .pull-right > h2 {
+  font-size: 35px;
+}
+
+.remark-slide-content > h3, .remark-slide-content > h4,
+.pull-left > h3, .pull-left > h4, .pull-right > h3, .pull-right > h4 {
+  font-size: 30px
+}
+
+.title-slide {
+  background-color: #FAFAFA;
+  border-top: 80px solid #FAFAFA;
+  background-image: url(img/background1.jpg);
+  background-size: cover;
+}
+
+
+.logo{
+position: absolute;
+  bottom: -20px;
+  right:10px;
+  width:60px;
+  opacity:0.8;
+  }
+
+
+.banner{
+position: absolute;
+  top: -20px;
+  left:0px;
+  width:100%;
+  }
+  
+
+
+.title-slide-custom {
+   border-top: 0px solid #FAFAFA;
+   background-color : white;
+  margin : 0px ;
+  padding:0px;
+  }
+
+.title-slide-custom > h1  {
+color: #ffffff; font-family: 'Raleway',sans-serif; font-size: 52px; font-weight: 800; line-height: 72px; margin: 0 0 24px; text-align: center; text-transform: uppercase;
+background-color:black;
+width:70%;
+margin-top : 200px;
+padding : 40px;
+border-top-right-radius : 50px;
+border-bottom-right-radius : 50px;
+opacity : 0.8;
+}
+
+.title-slide-custom > h2  {
+  position: relative;
+  top: 0px;
+  margin-top: 0px;
+  padding-bottom: -20px;
+  padding-right: 20px;
+  color: white;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 25px;
+  text-align:right;
+  background-color:black;
+  width:50%;
+  opacity : 0.8;
+  
+  border-bottom-right-radius : 50px;
+  border-top-right-radius : 50px;
+}
+.title-slide-custom > h3  {
+  position: absolute;
+  bottom: 10px;
+  color: white;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 15px;
+  text-align: left;
+  padding-left: 15px;
+  padding-right: 15px;  
+  padding-top: 5px;  
+  background-color:black;
+  opacity : 0.8;
+  border-top-right-radius : 20px;
+  
+}
+
+.remark-slide-number {
+  font-size: 9pt;
+  font-family: 'Fira Sans';
+  color: white;
+  background-color:#23373B;
+  padding-left : 5px;
+  padding-right : 5px;
+  opacity : 1;
+  margin-bottom: 651px;
+  margin-right: -20px;
+  display : none;
+}
+
+/* turns off slide numbers for title page: https://github.com/gnab/remark/issues/298 */
+.title-slide .remark-slide-number {
+  display: none;
+}
+
+.remark-inline-code {
+  /* background: #F5F5F5; /* lighter */
+  background: #e7e8e2; /* darker */
+  border-radius: 3px;
+  padding: 4px;
+}
+
+.code10 .remark-code {
+  font-size: 10%;
+}
+
+.code20 .remark-code {
+  font-size: 20%;
+}
+
+.code30 .remark-code {
+  font-size: 30%;
+}
+
+.code40 .remark-code {
+  font-size: 40%;
+}
+
+.code50 .remark-code {
+  font-size: 50%;
+}
+
+.code60 .remark-code {
+  font-size: 60%;
+}
+
+.code70 .remark-code {
+  font-size: 70%;
+}
+
+.code80 .remark-code {
+  font-size: 80%;
+}
+
+.code90 .remark-code {
+  font-size: 90%;
+}
+
+.code100 .remark-code {
+  font-size: 100%;
+}
+
+.font10 {
+  font-size: 10%;
+}
+
+.font20 {
+  font-size: 20%;
+}
+
+.font30 {
+  font-size: 30%;
+}
+
+.font40 {
+  font-size: 40%;
+}
+
+.font50 {
+  font-size: 50%;
+}
+
+.font60 {
+  font-size: 60%;
+}
+
+.font70 {
+  font-size: 70%;
+}
+
+.font80 {
+  font-size: 80%;
+}
+
+.font90 {
+  font-size: 90%;
+}
+
+.font100 {
+  font-size: 100%;
+}
+
+.font110 {
+  font-size: 110%;
+}
+
+.font120 {
+  font-size: 120%;
+}
+
+.font130 {
+  font-size: 130%;
+}
+
+.font140 {
+  font-size: 140%;
+}
+
+.font150 {
+  font-size: 150%;
+}
+
+.font160 {
+  font-size: 160%;
+}
+.font170 {
+  font-size: 170%;
+}
+.font180 {
+  font-size: 180%;
+}
+.font190 {
+  font-size: 190%;
+}
+.font200 {
+  font-size: 200%;
+}
