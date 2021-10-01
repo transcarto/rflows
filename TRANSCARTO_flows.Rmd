@@ -251,21 +251,9 @@ dev.off()
 
 <img src = "maps/spaghetti.png"></img>
 
-## Filtrages et indicateurs
+## Un pays de référence
 
-**FRANCOISE, TU METS TES TRUCS ICI !**
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ac commodo ante. Sed tincidunt tincidunt sollicitudin. Mauris odio orci, viverra et porttitor vitae, porta et arcu. Nam quis neque at elit accumsan fringilla. Cras rhoncus efficitur malesuada. Donec auctor, mauris sit amet mollis dignissim, purus urna ultricies ligula, non dictum sem quam in justo. Maecenas sit amet est accumsan, ullamcorper nulla luctus, efficitur diam. Aenean ac magna ut enim lacinia ultrices nec et sapien. Praesent scelerisque massa eros, vel tempus orci maximus at. Duis eget ipsum auctor, luctus ante in, egestas libero. Vestibulum vehicula ex a aliquam aliquam. Donec non efficitur risus. Aenean ut venenatis nisi, vitae iaculis nibh. Cras fermentum orci vel tempor sodales.
-
-Sed viverra ut ipsum in commodo. Quisque tempus tempus tortor ut feugiat. Morbi viverra, metus id feugiat vulputate, augue libero condimentum ex, vestibulum volutpat odio metus id arcu. Integer ullamcorper sed sapien ut sollicitudin. Ut aliquet, leo at elementum ornare, sem ante lacinia ante, ac porttitor justo arcu nec dolor. Cras porta nisl lobortis leo dignissim ullamcorper. Cras eu lorem imperdiet, malesuada risus ac, tempus neque. Integer in erat consequat, posuere sapien quis, pulvinar turpis. In sagittis cursus commodo. Praesent pellentesque commodo velit, quis suscipit dui sodales tristique. Mauris eleifend quam et odio viverra, quis suscipit ex semper. In semper id sapien id egestas. Mauris eros metus, rhoncus eu arcu convallis, sagittis tempor nunc. Pellentesque hendrerit, tortor at lacinia lacinia, neque neque interdum lacus, in finibus tortor metus et arcu. Praesent sed viverra lectus, nec elementum velit. In faucibus neque in risus ultricies cursus vel sed magna.
-
-Mauris a ante nec mi ornare egestas sit amet vel mauris. Maecenas ac dolor id dolor facilisis fermentum id a orci. Praesent sed dolor non nisl vulputate pulvinar. Donec vehicula vitae massa vel semper. Sed sit amet cursus odio. Fusce blandit ligula mollis justo consectetur, eget finibus nulla molestie. Morbi convallis nulla non mi finibus tempor. Vestibulum sagittis vitae mauris ut pulvinar. Morbi aliquam iaculis leo. Cras massa odio, commodo eu libero sit amet, dictum condimentum dolor. Donec posuere rutrum purus vitae euismod. Phasellus vel leo nec nisl varius luctus. Cras sed suscipit quam.
-
-# Vers des cartes un peu "stylées"
-
-## Sélectionner un seul pays
-
-Choix d'un pays
+Pour simplifier la carte, on peut choisir un seuk pays de référence
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 ISO3 <- "FRA"
@@ -421,6 +409,18 @@ dev.off()
 ```
 
 <img src = "maps/flows1.png"></img>
+
+# Filtrages et indicateurs
+
+**FRANCOISE, TU METS TES TRUCS ICI !**
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ac commodo ante. Sed tincidunt tincidunt sollicitudin. Mauris odio orci, viverra et porttitor vitae, porta et arcu. Nam quis neque at elit accumsan fringilla. Cras rhoncus efficitur malesuada. Donec auctor, mauris sit amet mollis dignissim, purus urna ultricies ligula, non dictum sem quam in justo. Maecenas sit amet est accumsan, ullamcorper nulla luctus, efficitur diam. Aenean ac magna ut enim lacinia ultrices nec et sapien. Praesent scelerisque massa eros, vel tempus orci maximus at. Duis eget ipsum auctor, luctus ante in, egestas libero. Vestibulum vehicula ex a aliquam aliquam. Donec non efficitur risus. Aenean ut venenatis nisi, vitae iaculis nibh. Cras fermentum orci vel tempor sodales.
+
+Sed viverra ut ipsum in commodo. Quisque tempus tempus tortor ut feugiat. Morbi viverra, metus id feugiat vulputate, augue libero condimentum ex, vestibulum volutpat odio metus id arcu. Integer ullamcorper sed sapien ut sollicitudin. Ut aliquet, leo at elementum ornare, sem ante lacinia ante, ac porttitor justo arcu nec dolor. Cras porta nisl lobortis leo dignissim ullamcorper. Cras eu lorem imperdiet, malesuada risus ac, tempus neque. Integer in erat consequat, posuere sapien quis, pulvinar turpis. In sagittis cursus commodo. Praesent pellentesque commodo velit, quis suscipit dui sodales tristique. Mauris eleifend quam et odio viverra, quis suscipit ex semper. In semper id sapien id egestas. Mauris eros metus, rhoncus eu arcu convallis, sagittis tempor nunc. Pellentesque hendrerit, tortor at lacinia lacinia, neque neque interdum lacus, in finibus tortor metus et arcu. Praesent sed viverra lectus, nec elementum velit. In faucibus neque in risus ultricies cursus vel sed magna.
+
+Mauris a ante nec mi ornare egestas sit amet vel mauris. Maecenas ac dolor id dolor facilisis fermentum id a orci. Praesent sed dolor non nisl vulputate pulvinar. Donec vehicula vitae massa vel semper. Sed sit amet cursus odio. Fusce blandit ligula mollis justo consectetur, eget finibus nulla molestie. Morbi convallis nulla non mi finibus tempor. Vestibulum sagittis vitae mauris ut pulvinar. Morbi aliquam iaculis leo. Cras massa odio, commodo eu libero sit amet, dictum condimentum dolor. Donec posuere rutrum purus vitae euismod. Phasellus vel leo nec nisl varius luctus. Cras sed suscipit quam.
+
+# Vers des cartes un peu plus graphiques
 
 ## Une carte un peu plus sophistiquée avec *packcircles*
 
