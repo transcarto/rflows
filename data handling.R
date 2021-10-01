@@ -173,10 +173,11 @@ migfiles <- function(sheet,year){
   
   # ISO codes
   
-  countries <- data.frame(world[,1:3])
-  countries$geometry <- NULL
-  countries <- countries[order(countries[,"label"], decreasing =FALSE),]
-  codes <- countries$adm0_a3_is
+  countries <- st_read("data/world/geom/countries.gpkg")
+  codes <- countries[,1:3] %>% st_drop_geometry()
+  
+  codes <- codes[order(codes[,"label"], decreasing =FALSE),]
+  codes <- codes$adm0_a3_is
   ## Verif
   # countries$rows <- migr[,"i"]
   # countries$cols <- colnames(migr)[-1]
