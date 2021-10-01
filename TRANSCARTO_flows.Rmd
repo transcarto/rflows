@@ -1162,8 +1162,9 @@ colnames(intra) <- c("id", "nb")
 knitr::kable(intra, row.names = F, digits = 1)
 ```
 
+Calcul des flux (plot = FALSE)
+
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
-template("Flux inter et flux intra", "maps/interintra.png")
 flows <- ttt_flowmapper(
   x = subregions,
   xid = "id",
@@ -1182,9 +1183,64 @@ flows <- ttt_flowmapper(
   df2 = intra,
   df2id = "id",
   df2var = "nb",
-  col2 = "#eb4034",
-  border2 = "#424242"
+  col2 = "#3b3b3b",
+  border2 = col,
+  plot = FALSE
 )
+```
+
+Affichage de la carte avec mapsf
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
+template("Flux inter et flux intra", "maps/interintra.png")
+
+mf_shadow(x = flows$flows, col = "grey70", cex = 0.2, add = TRUE)
+
+mf_map(
+  flows$flows,
+  var = "fij",
+  col = col,
+  border = "#3b3b3b",
+  leg_pos = "n",
+  add = TRUE
+)
+
+mf_map(
+  flows$circles,
+  var = "fij",
+  col = "#3b3b3b",
+  border = col,
+  lwd = 1.5,
+  leg_pos = "n",
+  add = TRUE
+)
+
+mf_label(
+  flows$circles,
+  var = "nb",
+  halo = FALSE,
+  cex = sqrt(as.numeric(flows$circles$nb) / 18000),
+  #cex = 1,
+  col = col,
+  overlap = TRUE,
+  lines = FALSE
+)
+
+
+mf_label(
+  flows$flows,
+  var = "fij",
+  halo = TRUE,
+  cex = 0.7,
+  col = col2,
+  bg = col,
+  r = 0.1,
+  overlap = FALSE,
+  lines = FALSE
+)
+
+
+
 dev.off()
 ```
 
