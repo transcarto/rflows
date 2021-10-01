@@ -10,6 +10,10 @@ link_citations: true
 
 **L'objectif de cette séance est de montrer comment réaliser des cartes de flux diverses et variées à partir de données matrice pays * pays. Pour cela, le code est souvent assez verbeux. Et beaucoup de choses se font en R base. Il y a beaucoup de manipulation de données. L'idée n'est donc pas ici de commenter tout le code, mais d'expliciter une démarche. C'est à dire montrer comment on peut réaliser des cartes de flux dans R, dans une démarche traçable, partageable et reproductible.**
 
+> Ce document est accessible à l'adresse suivante [A completer]()
+
+> Le code source ets disponible ici [A completer]()
+
 # Les packages
 
 Avant de commencer, voici la liste des packages à installer et à charger. Les 3 packages les plus importants sont *sf*, *mapsf* et *ttt*.
@@ -1320,3 +1324,102 @@ new Runtime().module(define, name => {
 
 # A vous de jouer
 
+Et si on essayait de faire des cartes de flux sur un fond de carte déformé. Ici, par la population en 2019.
+
+Les données
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
+migrCountries <- read.csv("data/world/cartogram/migr2019_T.csv")
+migrSubregions <-  read.csv("data/world/cartogram/migrSubregions2019_T.csv")
+```
+
+Les géométries
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
+countriesPop <- st_read("data/world/cartogram/countriesPop.shp")
+subregionsPop <- st_read("data/world/cartogram/regionsPop.shp")
+gridPop <- st_read("data/world/cartogram/grid.shp")
+```
+
+Quelques variables d'affichage
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
+col = "#ffc524"
+votrenom = "Miles Davis & Frances Taylor, kings of cool, 1965"
+```
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
+
+credit = paste0(
+  votrenom,"\n",
+  "Source: United Nations, Department of Economic\n",
+  "and Social Affairs, Population Division (2019)"
+)
+
+theme <- mf_theme(
+  x = "default",
+  bg = "#3b3b3b",
+  fg = "#ffc524",
+  mar = c(0, 0, 2, 0),
+  tab = TRUE,
+  pos = "left",
+  inner = FALSE,
+  line = 2,
+  cex = 1.9,
+  font = 3
+)
+
+template = function(title, file) {
+  mf_export(
+    countriesPop,
+    export = "png",
+    width = 1000,
+    filename = file,
+    res = 96,
+    theme = theme,
+    expandBB = c(-.02, 0, -.02, 0)
+  )
+
+  mf_map(gridPop,
+         col = "#FFFFFF70",
+         lwd = 0.4,
+         add = TRUE)
+  mf_map(
+    countriesPop,
+    col = "#4e4f4f",
+    border = "#3b3b3b",
+    lwd = 0.5,
+    add = TRUE
+  )
+  
+    mf_map(
+    subregionsPop,
+    col = "NA",
+    border = col,
+    lwd = 0.5,
+    add = TRUE
+  )
+  # mf_map(links, col = NA,border = "#317691", lwd = 0.5, add = TRUE)
+  mf_credits(
+    txt = credit,
+    pos = "bottomright",
+    col = "#1a2640",
+    cex = 0.5,
+    font = 3,
+    bg = "#ffffff30"
+  )
+  mf_title(title)
+}
+```
+
+A vous de jouer...
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
+template("World Population, 2019", "maps/cartogram.png")
+
+# METTEZ DES TRUCS ICI ! 
+
+dev.off()
+```
+
+<img src = "maps/cartogram.png"></img>
