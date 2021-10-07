@@ -1,0 +1,255 @@
+---
+title: "TTT</br>Flux et champs vectoriel </br>pour la visualisation de matrice OD</br>"
+author: "Etienne Côme"
+date: "**2020**"
+output:
+  unilur::tutorial_html_solution:
+    toc: true
+    toc_float: false
+    toc_depth: 1
+    suffix: ""
+    theme: journal
+    highlight: kate
+    number_sections: no
+    number_subsections: no
+---
+
+```{r knitr_init, echo=FALSE, cache=FALSE, include=FALSE}
+library(knitr)
+library(sf)
+library(dplyr)
+library(ttt)
+## Global options
+options(max.print="90")
+opts_chunk$set(echo=TRUE,
+               cache=FALSE, #TRUE
+               prompt=FALSE,
+               tidy=FALSE,
+               comment=NA,
+               message=FALSE,
+               warning=FALSE)
+opts_knit$set(width=90)
+options(width = 90)
+
+# no margins
+knit_hooks$set(nm = function(before, options, envir){
+  if (before){
+    par(mar=c(0,0,0,0))
+  }
+})
+
+# title margins
+knit_hooks$set(sm = function(before, options, envir){
+  if (before){
+    par(mar=c(0,0,1.2,0))
+  }
+})
+
+# boxes custom
+#devtools::install_github("koncina/unilur")
+knitr::opts_template$set(alert = list(box.title = "Watch out!",
+                                      box.body = list(fill = "#ffe0d9", colour = "black"),
+                                      box.header = list(fill = "#FFAD99", colour = "black"),
+                                      box.collapse = NULL,
+                                      box.icon = "fa-exclamation-triangle"))
+knitr::opts_template$set(solution = list(box.title = "Solution",
+                                         box.body = list(fill = "#e6f6e7", colour = "black"),
+                                         box.header = list(fill = "#ace1af", colour = "black"),
+                                         box.icon = "fa-check-square",
+                                         box.collapse = TRUE))
+knitr::opts_template$set(information = list(box.title = "Information",
+                                            box.body = list(fill = "#bbe8f4", colour = "black"),
+                                            box.header = list(fill = "#64c9e6", colour = "black"),
+                                            box.icon = "fa-info-circle",
+                                            box.collapse = NULL))
+knitr::opts_template$set(clues = list(box.title = "Indices",
+                                      box.body = list(fill = "#fff9dc", colour = "black"),
+                                      box.header = list(fill = "#ffec8b", colour = "black"),
+                                      box.icon = "fa-search",
+                                      box.collapse = TRUE))
+```
+
+
+</br>
+
+
+# Installation de ttt
+
+```{r, echo=TRUE,eval=FALSE}
+remotes::install_github("tributetotobler/ttt")
+library(ttt)
+library(sf)
+library(dplyr)
+```
+
+# Exercise 1 : Un exemple historique, les dollars de Tobler
+
+```{block, box.title = "Lire des données", box.body = list(fill = "white"), box.icon = "fa-star"}
+Importez les données dollars contenues dans le package `ttt` et regardez leurs structure. 
+```
+
+
+```{block, opts.label = "clues"}
+Utilisez `data(dollars)` et `str(dollars)`
+```
+
+```{r, solution = TRUE}
+data(dollars)
+str(dollars)
+```
+```{block, box.title = "Structure des données", box.body = list(fill = "white"), box.icon = "fa-star"}
+Vous devriez avoir dans votre environement une liste `dollars` avec trois champs  :
+
+- un champ `OD` contenant une matrice OD de taille 12 x 12 contenant des flux
+- un champ `polygones` contenant les contours des 12 régions des USA 
+```
+
+```{block, box.title = "Calculez les balances", box.body = list(fill = "white"), box.icon = "fa-star"}
+Calculez les balances en chaque noeuds de la matrice OD.  
+```
+
+
+```{block, opts.label = "clues"}
+Utilisez `?rowSums` et `?colSums`
+```
+
+
+```{r, solution=TRUE}
+delta = rowSums(dollars$OD)-colSums(dollars$OD)
+dollars$polygones$delta=delta
+```
+
+```{block, box.title = "Carte +/- ", box.body = list(fill = "white"), box.icon = "fa-star"}
+Faire une carte en +/- des balances.
+```
+
+
+```{block, opts.label = "clues"}
+Utilisez la fonction `?plus_minus_map`.
+```
+
+
+```{r, echo=FALSE}
+plot(st_geometry(dollars$polygones))
+plus_minus_map(dollars$polygones,"delta")
+```
+
+```{r, solution=TRUE}
+plot(st_geometry(dollars$polygones))
+plus_minus_map(dollars$polygones,"delta")
+```
+
+```{block, box.title = "Calcul du potentiel", box.body = list(fill = "white"), box.icon = "fa-star"}
+Calculez le potentiel de poisson de ce jeu de données. 
+```
+
+
+```{block, opts.label = "clues"}
+Utilisez la fonction `?poisson.potential`.
+```
+
+```{r, solution=TRUE}
+pot.dollars = compute_poisson_potential(dollars$polygones,nb_it = 5000)
+```
+
+```{block, box.title = "Visualisation du potentiel", box.body = list(fill = "white"), box.icon = "fa-star"}
+Regarder la structure de la data.frame retournée et visualisé le champs potentiel stocké dans la colonne `attractivity`.
+```
+
+
+```{block, opts.label = "clues"}
+Utilisez la fonction `?str` et `?plot` ou la librairie `ggplot` si vous le souhaitez.
+```
+
+
+```{r, echo=FALSE}
+plot(pot.dollars%>% select(attractivity))
+```
+
+```{r, solution=TRUE}
+str(pot.dollars)
+plot(pot.dollars%>% select(attractivity))
+```
+
+
+```{r, echo=FALSE}
+plot(st_geometry(dollars$polygones))
+poisson_flows_map(pot.dollars)
+```
+
+```{r, solution=TRUE}
+plot(st_geometry(dollars$polygones))
+poisson_flows_map(pot.dollars)
+```
+
+# Exercice 2 : Données de migrations résidentielles
+
+```{block, box.title = "Données ", box.body = list(fill = "white"), box.icon = "fa-star"}
+Importez les données dollars contenues dans le package `ttt` et regardez leurs structure. 
+```
+
+```{r, solution=TRUE}
+migr_agg=readRDS("FD_MIGCOM_2018AGG.rds") %>% mutate_if(is.factor,as.character)
+```
+
+```{r, solution=TRUE}
+com_arr = migr_agg %>% select(COMMUNE,ARM) %>% filter(ARM!="ZZZZZ") %>% distinct()
+```
+```{r, solution=TRUE}
+migr_com = migr_agg  %>%
+  left_join(com_arr,by=c("DCRAN"="ARM")) %>%
+  mutate(COMMUNE_ANM1 = if_else(is.na(COMMUNE.y),DCRAN,COMMUNE.y),COMMUNE=COMMUNE.x) %>%
+  select(COMMUNE,COMMUNE_ANM1,CSM,IPONDI) %>%
+  mutate(DEP_ANM1= substr(COMMUNE_ANM1,1,2),DEP = substr(COMMUNE,1,2))
+```
+```{r, solution=TRUE}
+migr_clean = migr_com %>%
+  filter(CSM==7) %>%
+  filter(COMMUNE!=COMMUNE_ANM1) %>%
+  filter(!(DEP %in% c("2A","2B",96:100)),!(DEP_ANM1 %in% c("2A","2B",96:100))) %>%
+  arrange(desc(IPONDI))
+```
+```{r, solution=TRUE}
+migr_in = migr_clean %>% group_by(COMMUNE) %>% summarize(NIN = sum(IPONDI))
+migr_out = migr_clean %>% group_by(COMMUNE_ANM1) %>% summarize(NOUT = sum(IPONDI))
+
+delta = migr_in %>% full_join(migr_out,by=c("COMMUNE"="COMMUNE_ANM1")) %>%
+  tidyr::replace_na(list(NIN=0,NOUT=0)) %>%
+  mutate(delta = NIN-NOUT)
+```
+```{r, solution=TRUE}
+#remotes::install_github("antuki/CARTElette/CARTElette@RPackage")
+#library(CARTElette)
+#COM <- charger_carte(COG=2020,nivsupra="COM")
+#library(sf)
+#library(dplyr)
+#write_sf(COM,"COM.gpkg")
+COM= read_sf("COM.gpkg")
+```
+```{r, solution=TRUE}
+delta_geo = COM %>%
+  filter(!(INSEE_DEP %in% c("2A","2B",971:976))) %>%
+  left_join(delta,by=c("INSEE_COM"="COMMUNE")) %>%
+  tidyr:: replace_na(list(delta=0)) %>%
+  st_transform(2154)
+```
+```{r, solution=TRUE}
+
+plot(delta_geo %>% group_by(INSEE_DEP) %>% summarize(delta=sum(delta)) %>% ungroup() %>% select(delta))
+```
+```{r, solution=TRUE}
+pot = compute_poisson_potential(delta_geo,cellsize = 10000,nb_it = 5000)
+plot(pot %>% select(attractivity))
+```
+
+
+
+
+
+
+**reproducibility**
+
+```{r}
+sessionInfo()
+```
+
