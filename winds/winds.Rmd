@@ -101,11 +101,11 @@ str(dollars)
 Vous devriez avoir dans votre environement une liste `dollars` avec trois champs  :
 
 - un champ `OD` contenant une matrice OD de taille 12 x 12 contenant des flux
-- un champ `polygones` contenant les contours des 12 régions des USA 
+- un champ `polygones` contenant les contours des 12 régions monéatires des USA 
 ```
 
 ```{block, box.title = "Calculez les balances", box.body = list(fill = "white"), box.icon = "fa-star"}
-Calculez les balances en chaque noeuds de la matrice OD.  
+Calculez les balances en chaque noeuds de la matrice OD et stockez le résultats dans une colonne delta de la data.frame polygones.  
 ```
 
 
@@ -153,7 +153,7 @@ pot.dollars = compute_poisson_potential(dollars$polygones,nb_it = 5000)
 ```
 
 ```{block, box.title = "Visualisation du potentiel", box.body = list(fill = "white"), box.icon = "fa-star"}
-Regarder la structure de la data.frame retournée et visualisé le champs potentiel stocké dans la colonne `attractivity`.
+Regardez la structure de la data.frame retournée et visualisez le champs potentiel stocké dans la colonne `attractivity`.
 ```
 
 
@@ -172,29 +172,57 @@ plot(pot.dollars%>% select(attractivity))
 ```
 
 
+```{block, box.title = "Visualisation du champ vectoriel", box.body = list(fill = "white"), box.icon = "fa-star"}
+Visualisez de manière statique le champ vectoriel calculée à l'aide de la fonction `poisson_flow_map`. N'oubliez pas de régler le paramètre `normfact` pour obtenir quelque chose de lisible.
+```
+
+
+
 ```{r, echo=FALSE}
 plot(st_geometry(dollars$polygones))
-poisson_flows_map(pot.dollars)
+poisson_flows_map(pot.dollars,normfact=0.01)
 ```
 
 ```{r, solution=TRUE}
 plot(st_geometry(dollars$polygones))
-poisson_flows_map(pot.dollars)
+poisson_flows_map(pot.dollars,normfact=0.01)
 ```
 
 # Exercice 2 : Données de migrations résidentielles
 
 ```{block, box.title = "Données ", box.body = list(fill = "white"), box.icon = "fa-star"}
-Importez les données dollars contenues dans le package `ttt` et regardez leurs structure. 
+Importez les données `FD_MIGCOM_2018AGG.rds` à l'aide de la fonction `readRDS`. Cette data.frame correspond aux données de détails sur les migrations résidentielles française de l'INSEE  [(https://www.insee.fr/fr/statistiques/5395755?sommaire=5395764#dictionnaire)](https://www.insee.fr/fr/statistiques/5395755?sommaire=5395764#dictionnaire). Cette base de données à juste été aggrégée pour ne garder qu'un facteur de variation la catégorie socio-professionelle `CSM` de manière à la rendre un peu plus légère.
 ```
 
 ```{r, solution=TRUE}
-migr_agg=readRDS("FD_MIGCOM_2018AGG.rds") %>% mutate_if(is.factor,as.character)
+migr_agg=readRDS("FD_MIGCOM_2018AGG.rds") 
+```
+
+
+```{block, box.title = "Gestion des arrondissement municipaux", box.body = list(fill = "white"), box.icon = "fa-star"}
+Dans cette base, la commune de destination est renseignée avec les codes des arrondissements municipaux pour les villes ayant plusieurs arrondissement. Nous allons commncer par créer une table ou les mouvements sont des mouvements de communes à communes. Pour ce faire, créez à partir de la table précédente une table `com_arr` contenant pour chaque communes ayant des arrondissements le code d'arrondissement (colonne `ARM`) et le code commune (colonne `COMMUNE`). Vous devriez obtenir la table suivante :
+```
+```{r, echo=FALSE}
+com_arr = migr_agg %>% select(COMMUNE,ARM) %>% filter(ARM!="ZZZZZ") %>% distinct()
+com_arr
 ```
 
 ```{r, solution=TRUE}
 com_arr = migr_agg %>% select(COMMUNE,ARM) %>% filter(ARM!="ZZZZZ") %>% distinct()
 ```
+
+```{block, box.title = "Gestion des arrondissement municipaux", box.body = list(fill = "white"), box.icon = "fa-star"}
+Utilisez cette table pour faire une jointure et récupérez les colonnes :
+
+- COMMUNE : commune de résidance
+- COMMUNE_ANM1 : commune de résidance (année n-1)
+- CSM : catégorie socio professionelle
+- IPONDI : poid de la ligne
+- DEP : département de résidance 
+- DEP_ANM1 : département de résidence (année n-1)
+```
+
+
 ```{r, solution=TRUE}
 migr_com = migr_agg  %>%
   left_join(com_arr,by=c("DCRAN"="ARM")) %>%
@@ -202,6 +230,16 @@ migr_com = migr_agg  %>%
   select(COMMUNE,COMMUNE_ANM1,CSM,IPONDI) %>%
   mutate(DEP_ANM1= substr(COMMUNE_ANM1,1,2),DEP = substr(COMMUNE,1,2))
 ```
+
+```{block, box.title = "Filtrage", box.body = list(fill = "white"), box.icon = "fa-star"}
+Filtrez la table pour ne cnserver que :
+
+- les lignes avec CSM == 7
+- les lignes ou COMLUNE et COMMUNE_ANM1 diffèrent
+- les lignes correspondant à des déménagement de france métropolitaine (hors corse) vers la france métropolitaine (hors corses).
+```
+
+
 ```{r, solution=TRUE}
 migr_clean = migr_com %>%
   filter(CSM==7) %>%
@@ -209,6 +247,17 @@ migr_clean = migr_com %>%
   filter(!(DEP %in% c("2A","2B",96:100)),!(DEP_ANM1 %in% c("2A","2B",96:100))) %>%
   arrange(desc(IPONDI))
 ```
+
+```{block, box.title = "Calcul des balances ", box.body = list(fill = "white"), box.icon = "fa-star"}
+Calculez pour chaque comunes en utilisant la table précédente :
+
+- le total des flux entrants
+- le total des flux sortants
+- la balance
+
+```
+
+
 ```{r, solution=TRUE}
 migr_in = migr_clean %>% group_by(COMMUNE) %>% summarize(NIN = sum(IPONDI))
 migr_out = migr_clean %>% group_by(COMMUNE_ANM1) %>% summarize(NOUT = sum(IPONDI))
@@ -217,6 +266,11 @@ delta = migr_in %>% full_join(migr_out,by=c("COMMUNE"="COMMUNE_ANM1")) %>%
   tidyr::replace_na(list(NIN=0,NOUT=0)) %>%
   mutate(delta = NIN-NOUT)
 ```
+
+```{block, box.title = "Données géographique ", box.body = list(fill = "white"), box.icon = "fa-star"}
+Utilisez la fonction  `read_sf` pour charger le fond de carte communal.  
+```
+
 ```{r, solution=TRUE}
 #remotes::install_github("antuki/CARTElette/CARTElette@RPackage")
 #library(CARTElette)
@@ -226,6 +280,12 @@ delta = migr_in %>% full_join(migr_out,by=c("COMMUNE"="COMMUNE_ANM1")) %>%
 #write_sf(COM,"COM.gpkg")
 COM= read_sf("COM.gpkg")
 ```
+
+```{block, box.title = "Données géographique ", box.body = list(fill = "white"), box.icon = "fa-star"}
+Filtrez le fond de carte pour ne conserver que les communes de france métropolitaine (hors corse). Faites la jointure avec votre table contenant les flux entrants, sortants totaux et les balances. Enfin projetez en Lambert 93 (code EPSG 2154).
+```
+
+
 ```{r, solution=TRUE}
 delta_geo = COM %>%
   filter(!(INSEE_DEP %in% c("2A","2B",971:976))) %>%
@@ -233,19 +293,54 @@ delta_geo = COM %>%
   tidyr:: replace_na(list(delta=0)) %>%
   st_transform(2154)
 ```
-```{r, solution=TRUE}
 
-plot(delta_geo %>% group_by(INSEE_DEP) %>% summarize(delta=sum(delta)) %>% ungroup() %>% select(delta))
+```{block, box.title = "Carte des balances", box.body = list(fill = "white"), box.icon = "fa-star"}
+Réalisez une carte symbole proportionelle des balances, la taille des symboles encodera la valeur abolue de la balance et la couleur le signe. Réalisez ensuite une carte en symboles +/-.
 ```
+
+```{r, echo=FALSE}
+delta_dep = delta_geo %>% group_by(INSEE_DEP) %>% summarize(delta=sum(delta)) %>% ungroup() %>% select(delta)
+library(ggplot2)
+ggplot(delta_dep)+geom_sf() + geom_sf(data=delta_dep %>% st_centroid(),aes(size=abs(delta),color=delta))+scale_color_gradient2()
+```
+
+
+```{r, solution=TRUE}
+delta_dep = delta_geo %>% group_by(INSEE_DEP) %>% summarize(delta=sum(delta)) %>% ungroup() %>% select(delta)
+library(ggplot2)
+ggplot(delta_dep)+ 
+  geom_sf()+ 
+  geom_sf(data=delta_dep %>% st_centroid(),aes(size=abs(delta),color=delta))+
+  scale_color_gradient2()
+```
+
+
+
+```{r, echo=FALSE,fig.width=9,fig.height=9}
+plot(delta_dep %>% st_geometry())
+plus_minus_map(delta_dep,"delta")
+```
+
+```{block, box.title = "Calcul du champ potentiel", box.body = list(fill = "white"), box.icon = "fa-star"}
+Calculez le champ potentiel de poisson sur ce jeu de données.
+```
+
 ```{r, solution=TRUE}
 pot = compute_poisson_potential(delta_geo,cellsize = 10000,nb_it = 5000)
+```
+
+```{block, box.title = "Calcul du champ potentiel", box.body = list(fill = "white"), box.icon = "fa-star"}
+Représentez le champ potentiel et le champ véctoriel.
+```
+
+```{r, echo=FALSE}
 plot(pot %>% select(attractivity))
 ```
 
 
-
-
-
+```{r, solution=TRUE}
+plot(pot %>% select(attractivity))
+```
 
 **reproducibility**
 
