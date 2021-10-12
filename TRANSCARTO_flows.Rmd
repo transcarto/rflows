@@ -1363,41 +1363,6 @@ dev.off()
 <img src ="img/migrexplorer3.png" width = "100%"></img>
 <a href = "https://analytics.huma-num.fr/Nicolas.Lambert/migrexplorer3/" target = "_BLANK">Ouvrir l'application</img></a></div>
 
-
-## Vers une implémantation dans Observable (svg/d3js)
-
-<div id="observablehq-viewof-x1coord-540722ad"></div>
-<div id="observablehq-viewof-y1coord-540722ad"></div>
-<div id="observablehq-viewof-x2coord-540722ad"></div>
-<div id="observablehq-viewof-y2coord-540722ad"></div>
-<div id="observablehq-viewof-r1-540722ad"></div>
-<div id="observablehq-viewof-r2-540722ad"></div>
-<div id="observablehq-viewof-thickness-540722ad"></div>
-<div id="observablehq-viewof-type-540722ad"></div>
-<div id="observablehq-map-540722ad" style = "width = 800px"></div>
-
-<script type="module">
-import {Runtime, Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
-import define from "https://api.observablehq.com/@neocartocnrs/arrows.js?v=3";
-new Runtime().module(define, name => {
-  if (name === "viewof x1coord") return new Inspector(document.querySelector("#observablehq-viewof-x1coord-540722ad"));
-  if (name === "viewof y1coord") return new Inspector(document.querySelector("#observablehq-viewof-y1coord-540722ad"));
-  if (name === "viewof x2coord") return new Inspector(document.querySelector("#observablehq-viewof-x2coord-540722ad"));
-  if (name === "viewof y2coord") return new Inspector(document.querySelector("#observablehq-viewof-y2coord-540722ad"));
-  if (name === "viewof r1") return new Inspector(document.querySelector("#observablehq-viewof-r1-540722ad"));
-  if (name === "viewof r2") return new Inspector(document.querySelector("#observablehq-viewof-r2-540722ad"));
-  if (name === "viewof thickness") return new Inspector(document.querySelector("#observablehq-viewof-thickness-540722ad"));
-  if (name === "viewof type") return new Inspector(document.querySelector("#observablehq-viewof-type-540722ad"));
-  if (name === "map") return new Inspector(document.querySelector("#observablehq-map-540722ad"));
-  return ["data","dots","rectangle","arrow","linetorect","linetoarrow"].includes(name);
-});
-</script>
-
-<div align = "center">
-<img src ="img/maflowobservable.png" width = "100%"></img>
-<a href = "https://observablehq.com/@neocartocnrs/flow-map" target = "_BLANK">Ouvrir l'application</img></a>
-</div>
-
 # A vous de jouer
 
 Et si on essayait de faire des cartes de flux sur un fond de carte déformé. Ici, par la population en 2019.
