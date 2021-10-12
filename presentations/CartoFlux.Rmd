@@ -308,6 +308,11 @@ Qui plus est, la migration des sans-papiers est souvent tout sauf une ligne droi
 # Alternatives (circulation)
 .center[<img src="img/rekaroue.jpg" width=70%>]
 
+???
+
+« La grande roue africaine » - Esquisse présentée au musée d'art moderne à Vienne (Autriche) en novembre 2007 lors de l'exposition "Waypoint to Sharon Stone" (Rendez-vous à Sharon Stone).
+
+« L’Afrique sauve l’Europe, qui appauvrit l’Afrique, qui nourrit l’Europe, qui asservit l’Afrique, qui paye l’Europe, qui continue de piller l’Afrique… (...)" 
 
 ---
 class: inverse middle center 
