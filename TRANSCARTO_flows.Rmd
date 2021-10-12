@@ -12,6 +12,7 @@ link_citations: true
 
 1. Créez un projet R et un script R.
 2. Créez un repertoire *data* pour stocker les données.
+3. Créez un répertoire *maps* dans lequel seront stockées les cartes
 
 > Ce document est accessible à l'adresse suivante [https://transcarto.github.io/rflows/TRANSCARTO_flows.html](https://transcarto.github.io/rflows/TRANSCARTO_flows.html)
 
