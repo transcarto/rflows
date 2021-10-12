@@ -10,9 +10,9 @@ link_citations: true
 
 **L'objectif de cette séance est de montrer comment réaliser des cartes de flux diverses et variées à partir de données matrice pays * pays. Pour cela, le code est souvent assez verbeux. Et beaucoup de choses se font en R base. Il y a beaucoup de manipulation de données. L'idée n'est donc pas ici de commenter tout le code, mais d'expliciter une démarche. C'est à dire montrer comment on peut réaliser des cartes de flux dans R, dans une démarche traçable, partageable et reproductible.**
 
-> Ce document est accessible à l'adresse suivante [A completer]()
+> Ce document est accessible à l'adresse suivante [https://transcarto.github.io/rflows/TRANSCARTO_flows.html](https://transcarto.github.io/rflows/TRANSCARTO_flows.html)
 
-> Le code source ets disponible ici [A completer]()
+> Le code source est disponible ici [https://github.com/transcarto/rflows](https://github.com/transcarto/rflows)
 
 # Les packages
 
@@ -46,7 +46,7 @@ library("reshape2")
 Ici, nous utilisons des données géométriques sur mesure qui permettent de coller exactement avec les données à cartographier. Il s'agit d'un fond de carte des pays du monde dont la nomenclature correspond à celle des données statistiques fournies par les nations unies. 
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
-countries <- st_read("data/world/geom/countries.gpkg")
+countries <- st_read("https://github.com/transcarto/rflows/blob/master/data/world/geom/regions.gpkg?raw=true")
 graticule <- st_read("data/world/geom/graticule.gpkg")
 bbox <- st_read("data/world/geom/bbox.gpkg")
 
