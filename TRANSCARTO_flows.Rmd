@@ -443,6 +443,10 @@ Mauris a ante nec mi ornare egestas sit amet vel mauris. Maecenas ac dolor id do
 
 ## Une carte un peu plus sophistiquée avec *packcircles*
 
+Avec le code ci-dessous, on cherche à réaliser une carte à la façon de cette application interactive.
+
+> https://analytics.huma-num.fr/Nicolas.Lambert/migrexplorer/
+
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 ISO3 <- "FRA"
 label = "France"
@@ -747,8 +751,6 @@ dev.off()
 <img src = "maps/migrexplorer2.png"></img>
 
 Ces cartes, on peut les retrouver dans l'application MigrExplorer mise en ligne via R shiny. 
-
-> https://analytics.huma-num.fr/Nicolas.Lambert/migrexplorer/
 
 > https://gitlab.huma-num.fr/nlambert/migrexplorer/-/tree/master
 
