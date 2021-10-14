@@ -8,7 +8,7 @@ link_citations: true
   
 ---
 
-**L'objectif de cette séance est de montrer comment réaliser des cartes de flux diverses et variées à partir de données matrice pays * pays. Pour cela, le code est souvent assez verbeux. Et beaucoup de choses se font en R base. Il y a beaucoup de manipulation de données. L'idée n'est donc pas ici de commenter tout le code, mais d'expliciter une démarche. C'est à dire montrer comment on peut réaliser des cartes de flux dans R, dans une démarche traçable, partageable et reproductible.**
+**L'objectif de cette séance est de présenter la construction de différentes cartes de flux réalisées décrivant des flux migratoires internationaux observées à l'échelle mondiale. Pour cela, nous mobilisons une matrice de flux origine-destination (OD) internationale (pays * pays) asymétrique, ainsi qu'un fond de carte des pays du monde. Ces données statistiques et géographiques vont être traitées afin d'enrichir la représentation. L'ensemble des étapes est codé dans R, sous une forme qui n'est pas toujours optimisée et beaucoup des traitements réalisés mobilisent {R base}. </br> Le présent document présente l'ensemble de la chaîne de traitement : de la préparation des matrices OD, celle des fonds de carte à la représentation des flux du point de vue de lieux d'origine (ou de destination) et/ou des échanges entre OD, entraînant beaucoup de manipulations. </br> L'idée n'est donc pas de commenter le code _in extenso_, mais d'expliciter une démarche, c'est-à-dire de montrer comment on peut réaliser des cartes de flux dans R selon différentes perspectives, dans le cadre démarche traçable, partageable et reproductible**
 
 1. Créez un projet R et un script R.
 2. Créez un repertoire *data* pour stocker les données.
@@ -22,16 +22,17 @@ link_citations: true
 
 Avant de commencer, voici la liste des packages à installer et à charger. Les 3 packages les plus importants sont *sf*, *mapsf* et *ttt*.
 
+
 ```{r, eval = FALSE, message = FALSE, warning = FALSE}
-install.packages(sf)
-install.packages(remotes)
-install.packages(smoothr)
-install.packages(readxl)
-install.packages(comparator)
-install.packages(reshape2)
-library(remotes)
+install.packages("sf")
+install.packages("remotes")
+install.packages("smoothr")
+install.packages("readxl")
+install.packages("comparator")
+install.packages("reshape2")
+library("remotes")
 install_github("riatelab/mapsf")
-install.packages(cartograflow)
+install.packages("cartograflow")
 install_github("tributetotobler/ttt")
 ```
 
