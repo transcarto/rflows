@@ -248,9 +248,13 @@ Tout est prêt. Avançons ...
 
 # Premières explorations
 
+On considère la matrice migr : elle est formée de 11305 couples d'OD et de 3 variables.
+
+dim(migr)
+
 ## L'effet Spaghetti
 
-Création d'une couche de liens liens correspondant aux cellules renseignées de la matrice migr
+Création d'une couche de liens correspondant aux 11305 lignes de la matrice migr
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
 links <-
@@ -262,7 +266,7 @@ links <-
   )
 ```
 
-
+Cartographie de ces liens en utilisant le template. La carte spaghetti.png est enregistrée dans le répertoire ./maps
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 template("L'effet Spaghetti ", "maps/spaghetti.png")
@@ -276,16 +280,20 @@ dev.off()
 
 <img src = "maps/spaghetti.png"></img>
 
-## Un pays de référence
+Pour simplifier l'image de ces flux (réduire le nombre de signes représentés), plusieurs possibilités sont envisageables. L'une d'entre elles consiste à sélectionner les signes à représenter en raisonant soit sur les lignes/colonnes de la matrice (donc sur les lieux d'origine/destination) et/ou soit sur le coeur de la matrice (sur les relations). 
 
-Pour simplifier la carte, on peut choisir un seuk pays de référence
+Commençons par raisonner sur les lieux
+
+## Choix d'un pays de référence
+
+Pour simplifier la carte, on peut choisir un seul pays de référence depuis/vers lequel on observe les flux.
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 ISO3 <- "FRA"
 label = "France"
 ```
 
-Jointure et mise en forme des données
+Création d'une sous-matrice migrFRA, jointure et mise en forme des données
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 countr <- countries[, c("adm0_a3_is", "label")]
@@ -305,7 +313,27 @@ countr <- countr[-3]
 colnames(countr) <- c("id", "label", "fij", "geometry")
 ```
 
+
+
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
+install.packages("knitr")
+install.packages("rmarkdown")
+
+library("knitr")
+library("rmarkdown")
+
+knitr::kable(countr[c(0:10),], row.names = F, digits = 1)
+```
+
+
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+install.packages("knitr")
+install.packages("rmarkdown")
+
+library("knitr")
+library("rmarkdown")
+
 knitr::kable(countr[c(0:10),], row.names = F, digits = 1)
 ```
 
