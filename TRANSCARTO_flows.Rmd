@@ -139,7 +139,11 @@ dev.off()
 
 **Données de flux Origine-Destination**
 
-Nous utilisons un jeu de données sur les migrations internationales. _Migration Stock at subregional level_, 2019 Source : United Nations, Department of Economic and Social Affairs, Population Division (2019). Celui-ci est proposé au format xls. Nous l'importons et le mettons en forme via le code ci-dessous.
+Nous utilisons un jeu de données sur les migrations internationales. _Migration Stock at subregional level_, 2019 Source : United Nations, Department of Economic and Social Affairs, Population Division (2019).
+
+Ce jeu décrit l'effectif de populations partie ou acceuillie dans un pays autre que le leur, autorisant ainsi une géovisualisation sous la forme de stocks  et/ou sous la forme de flux de populations étrangères.
+
+Celui-ci est proposé au format xls. Nous l'importons et le mettons en forme via le code ci-dessous.
 
 > [Voir les données](data/world/UN_MigrantStockByOriginAndDestination_2019.xlsx)
 
@@ -314,7 +318,6 @@ colnames(countr) <- c("id", "label", "fij", "geometry")
 ```
 
 
-
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
 install.packages("knitr")
 install.packages("rmarkdown")
@@ -325,19 +328,7 @@ library("rmarkdown")
 knitr::kable(countr[c(0:10),], row.names = F, digits = 1)
 ```
 
-
-
-```{r, eval = TRUE, message = FALSE, warning = FALSE}
-install.packages("knitr")
-install.packages("rmarkdown")
-
-library("knitr")
-library("rmarkdown")
-
-knitr::kable(countr[c(0:10),], row.names = F, digits = 1)
-```
-
-Une première carte simple
+Réalisation d'une première carte de stocks sur le nombre d'étrangers en France : ; elle correspond à la somme marginale de la colonne iso3=FRA.
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 template(paste0("En 2019, il y avait ",total, " millions d'étrangers en France"),
@@ -368,7 +359,7 @@ dev.off()
 
 <img src = "maps/prop1.png"></img>
 
-La carte symétrique
+Réalisation d'une seconde carte de stocks sur le nombre de français à l'étranger ; elle correspond à la somme marginale de la ligne iso3=FRA.
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 countr <- countries[, c("adm0_a3_is", "label")]
