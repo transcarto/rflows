@@ -1,6 +1,6 @@
 ---
 title: "FAIRE DES CARTES DE FLUX DANS R"
-author: "BAHOKEN F.. & LAMBERT N."
+author: "BAHOKEN F. & LAMBERT N."
 date: "2021"
 output:
   rmdformats::readthedown
@@ -9,6 +9,7 @@ link_citations: true
 ---
 
 **L'objectif de cette séance est de présenter la construction de différentes cartes de flux réalisées décrivant des flux migratoires internationaux observées à l'échelle mondiale. Pour cela, nous mobilisons une matrice de flux origine-destination (OD) internationale (pays * pays) asymétrique, ainsi qu'un fond de carte des pays du monde. Ces données statistiques et géographiques vont être traitées afin d'enrichir la représentation. L'ensemble des étapes est codé dans R, sous une forme qui n'est pas toujours optimisée et beaucoup des traitements réalisés mobilisent {R base}. </br> Le présent document présente l'ensemble de la chaîne de traitement : de la préparation des matrices OD, celle des fonds de carte à la représentation des flux du point de vue de lieux d'origine (ou de destination) et/ou des échanges entre OD, entraînant beaucoup de manipulations. </br> L'idée n'est donc pas de commenter le code _in extenso_, mais d'expliciter une démarche, c'est-à-dire de montrer comment on peut réaliser des cartes de flux dans R selon différentes perspectives, dans le cadre démarche traçable, partageable et reproductible**
+
 
 1. Créez un projet R et un script R.
 2. Créez un repertoire *data* pour stocker les données.
@@ -31,7 +32,8 @@ install.packages("readxl")
 install.packages("comparator")
 install.packages("reshape2")
 library("remotes")
-install_github("riatelab/mapsf")
+#install_github("riatelab/mapsf")
+install.packages("mapsf")
 install.packages("cartograflow")
 install_github("tributetotobler/ttt")
 ```
@@ -48,7 +50,7 @@ library("reshape2")
 
 **Données géométriques**
 
-Ici, nous utilisons des données géométriques sur mesure qui permettent de coller exactement avec les données à cartographier. Il s'agit d'un fond de carte des pays du monde dont la nomenclature correspond à celle des données statistiques fournies par les nations unies. 
+Ici, nous utilisons des données géométriques sur mesure préparées en amont, qui permettent de coller exactement avec les données à cartographier. Il s'agit d'un fond de carte des pays du monde dont la nomenclature correspond à celle des données statistiques fournies par les Nations unies. 
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 countries <- st_read("https://raw.githubusercontent.com/transcarto/rflows/master/data/world/geom/countries.geojson")
