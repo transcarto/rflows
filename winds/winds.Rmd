@@ -98,14 +98,14 @@ data(dollars)
 str(dollars)
 ```
 ```{block, box.title = "Structure des données", box.body = list(fill = "white"), box.icon = "fa-star"}
-Vous devriez avoir dans votre environement une liste `dollars` avec trois champs  :
+Vous devriez avoir dans votre environnement une liste `dollars` avec trois champs  :
 
 - un champ `OD` contenant une matrice OD de taille 12 x 12 contenant des flux
-- un champ `polygones` contenant les contours des 12 régions monéatires des USA 
+- un champ `polygones` contenant les contours des 12 régions monétaires des USA 
 ```
 
 ```{block, box.title = "Calculez les balances", box.body = list(fill = "white"), box.icon = "fa-star"}
-Calculez les balances en chaque noeuds de la matrice OD et stockez le résultats dans une colonne delta de la data.frame polygones.  
+Calculez les balances en chaque nœuds de la matrice OD et stockez le résultats dans une colonne delta de la data.frame polygones.  
 ```
 
 
@@ -191,7 +191,7 @@ poisson_flows_map(pot.dollars,normfact=0.01)
 # Exercice 2 : Données de migrations résidentielles
 
 ```{block, box.title = "Données ", box.body = list(fill = "white"), box.icon = "fa-star"}
-Importez les données `FD_MIGCOM_2018AGG.rds` à l'aide de la fonction `readRDS`. Cette data.frame correspond aux données de détails sur les migrations résidentielles française de l'INSEE  [(https://www.insee.fr/fr/statistiques/5395755?sommaire=5395764#dictionnaire)](https://www.insee.fr/fr/statistiques/5395755?sommaire=5395764#dictionnaire). Cette base de données à juste été aggrégée pour ne garder qu'un facteur de variation la catégorie socio-professionelle `CSM` de manière à la rendre un peu plus légère.
+Importez les données `FD_MIGCOM_2018AGG.rds` à l'aide de la fonction `readRDS`. Cette data.frame correspond aux données de détails sur les migrations résidentielles française de l’INSEE  [(https://www.insee.fr/fr/statistiques/5395755?sommaire=5395764#dictionnaire)](https://www.insee.fr/fr/statistiques/5395755?sommaire=5395764#dictionnaire). Cette base de données à juste été agrégée pour ne garder qu'un facteur de variation la catégorie socio-professionnelle `CSM` de manière à la rendre un peu plus légère.
 ```
 
 ```{r, solution=TRUE}
@@ -200,7 +200,7 @@ migr_agg=readRDS("FD_MIGCOM_2018AGG.rds")
 
 
 ```{block, box.title = "Gestion des arrondissement municipaux", box.body = list(fill = "white"), box.icon = "fa-star"}
-Dans cette base, la commune de destination est renseignée avec les codes des arrondissements municipaux pour les villes ayant plusieurs arrondissement. Nous allons commncer par créer une table ou les mouvements sont des mouvements de communes à communes. Pour ce faire, créez à partir de la table précédente une table `com_arr` contenant pour chaque communes ayant des arrondissements le code d'arrondissement (colonne `ARM`) et le code commune (colonne `COMMUNE`). Vous devriez obtenir la table suivante :
+Dans cette base, la commune de destination est renseignée avec les codes des arrondissements municipaux pour les villes ayant plusieurs arrondissement. Nous allons commencer par créer une table ou les mouvements sont des mouvements de communes à communes. Pour ce faire, créez à partir de la table précédente une table `com_arr` contenant pour chaque communes ayant des arrondissements le code d'arrondissement (colonne `ARM`) et le code commune (colonne `COMMUNE`). Vous devriez obtenir la table suivante :
 ```
 ```{r, echo=FALSE}
 com_arr = migr_agg %>% select(COMMUNE,ARM) %>% filter(ARM!="ZZZZZ") %>% distinct()
@@ -214,11 +214,11 @@ com_arr = migr_agg %>% select(COMMUNE,ARM) %>% filter(ARM!="ZZZZZ") %>% distinct
 ```{block, box.title = "Gestion des arrondissement municipaux", box.body = list(fill = "white"), box.icon = "fa-star"}
 Utilisez cette table pour faire une jointure et récupérez les colonnes :
 
-- COMMUNE : commune de résidance
-- COMMUNE_ANM1 : commune de résidance (année n-1)
-- CSM : catégorie socio professionelle
-- IPONDI : poid de la ligne
-- DEP : département de résidance 
+- COMMUNE : commune de résidence
+- COMMUNE_ANM1 : commune de résidence (année n-1)
+- CSM : catégorie socio professionnelle
+- IPONDI : poids de la ligne
+- DEP : département de résidence 
 - DEP_ANM1 : département de résidence (année n-1)
 ```
 
@@ -232,11 +232,11 @@ migr_com = migr_agg  %>%
 ```
 
 ```{block, box.title = "Filtrage", box.body = list(fill = "white"), box.icon = "fa-star"}
-Filtrez la table pour ne cnserver que :
+Filtrez la table pour ne conserver que :
 
 - les lignes avec CSM == 7
 - les lignes ou COMLUNE et COMMUNE_ANM1 diffèrent
-- les lignes correspondant à des déménagement de france métropolitaine (hors corse) vers la france métropolitaine (hors corses).
+- les lignes correspondant à des déménagement de France métropolitaine (hors corse) vers la France métropolitaine (hors corses).
 ```
 
 
@@ -249,7 +249,7 @@ migr_clean = migr_com %>%
 ```
 
 ```{block, box.title = "Calcul des balances ", box.body = list(fill = "white"), box.icon = "fa-star"}
-Calculez pour chaque comunes en utilisant la table précédente :
+Calculez pour chaque communes en utilisant la table précédente :
 
 - le total des flux entrants
 - le total des flux sortants
@@ -282,7 +282,7 @@ COM= read_sf("COM.gpkg")
 ```
 
 ```{block, box.title = "Données géographique ", box.body = list(fill = "white"), box.icon = "fa-star"}
-Filtrez le fond de carte pour ne conserver que les communes de france métropolitaine (hors corse). Faites la jointure avec votre table contenant les flux entrants, sortants totaux et les balances. Enfin projetez en Lambert 93 (code EPSG 2154).
+Filtrez le fond de carte pour ne conserver que les communes de France métropolitaine (hors corse). Faites la jointure avec votre table contenant les flux entrants, sortants totaux et les balances. Enfin projetez en Lambert 93 (code EPSG 2154).
 ```
 
 
@@ -295,13 +295,18 @@ delta_geo = COM %>%
 ```
 
 ```{block, box.title = "Carte des balances", box.body = list(fill = "white"), box.icon = "fa-star"}
-Réalisez une carte symbole proportionelle des balances, la taille des symboles encodera la valeur abolue de la balance et la couleur le signe. Réalisez ensuite une carte en symboles +/-.
+Réalisez une carte symbole proportionnelle des balances, la taille des symboles encodera la valeur absolue de la balance et la couleur le signe. Réalisez ensuite une carte en symboles +/-.
 ```
 
 ```{r, echo=FALSE}
 delta_dep = delta_geo %>% group_by(INSEE_DEP) %>% summarize(delta=sum(delta)) %>% ungroup() %>% select(delta)
 library(ggplot2)
-ggplot(delta_dep)+geom_sf() + geom_sf(data=delta_dep %>% st_centroid(),aes(size=abs(delta),color=delta))+scale_color_gradient2()
+ggplot(delta_dep)+geom_sf() + 
+  geom_sf(data=delta_dep %>% st_centroid(),aes(size=abs(delta),color=delta))+
+  scale_color_gradient2("Balance")+
+  scale_size_area("|Balance|") + 
+  theme_minimal() +
+  labs(title="Balance départementale des migrations résidentielles",subtitle="des retraités en 2018")
 ```
 
 
@@ -330,7 +335,7 @@ pot = compute_poisson_potential(delta_geo,cellsize = 10000,nb_it = 5000)
 ```
 
 ```{block, box.title = "Calcul du champ potentiel", box.body = list(fill = "white"), box.icon = "fa-star"}
-Représentez le champ potentiel et le champ véctoriel.
+Représentez le champ potentiel et le champ vectoriel.
 ```
 
 ```{r, echo=FALSE}
@@ -340,6 +345,24 @@ plot(pot %>% select(attractivity))
 
 ```{r, solution=TRUE}
 plot(pot %>% select(attractivity))
+```
+
+```{block, box.title = "Analyse par catgéorie socio-professionelle", box.body = list(fill = "white"), box.icon = "fa-star"}
+Reprenez la démarche précédente pour construire et représentez les champs associés à d’autres catégories professionnelles. Vous pouvez également étudier les différences de résultats obtenues lorsque les balances sont calculées en prenant en compte les flux hors de la France métropolitaine.  
+```
+
+```{block, box.title = "Droplets", box.body = list(fill = "white"), box.icon = "fa-star"}
+Exportez les données associées à un calcul de champ à l'aide de la fonction `jsonlite::write_json` . Utilisez le notebook Observable disponible à l'adresse [https://observablehq.com/@comeetie/ttt-poisson-potential](https://observablehq.com/@comeetie/ttt-poisson-potential) pour l'explorer à l'aide d'une visualisation en droplets. Profitez en pour observez l'influence des paramètres graphiques influençant cette visualisation :
+
+- Nombre de particules
+- Vitesse des particules
+- Durée de vie des particules
+- Coefficient de traînée
+
+```
+
+```{r}
+jsonlite::write_json(pot,"./potential_migrfr.json")
 ```
 
 **reproducibility**
