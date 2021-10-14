@@ -217,6 +217,73 @@ migr <- migr[,-1]
 knitr::kable(migr[c(0:15),c(0:15)], row.names = T, digits = 1)
 ```
 
+
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+library("cartograflow")
+
+tabflow<-migr
+
+#Verification si la matrice est carree et fermee
+
+matflow<-flowtabmat(tabflow,matlist="M")
+
+# Rendre la matrice carree
+#---------------------
+
+# on cree une liste des codes ISO de l'ensemble des entités
+library("dplyr")
+
+liste<-countries%>%select(adm0_a3_is)
+liste<-as.data.frame(liste$adm0_a3_is)
+
+#on s'en sert pour creer la matrice
+
+tabflow2<-flowcarre(tab=tabflow,
+                   liste=liste,
+                   origin = "i", dest="j",valflow="fij",
+                   format="L",
+                   diagonale = TRUE,
+                   empty.sq = FALSE
+)
+
+#on renomme les variables correctement
+colnames(tabflow2)<-c("i", "j", "fij")
+
+tabflow2$i<-as.character(tabflow2$i)
+tabflow2$j<-as.character(tabflow2$j)
+tabflow2$fij<-as.numeric(tabflow2$fij)
+
+# On calcule des indicateurs 
+
+# Volume bilateral as Tobler
+
+flow_vol2<-flowtype(tabflow2, origin ="i",destination="j",fij="fij", 
+                   format="L",x="bivolum")
+
+# solde/balance bilateral as Tobler
+
+flow_net2<-flowtype(tabflow2, origin ="i",destination="j",fij="fij", 
+                   format="L", x="bibal")
+
+
+#calcule plusieurs indicateurs
+flow_indic<-flowtype(tabflow2, origin ="i",destination="j",fij="fij", 
+                   format="L", x="alltypes")
+
+#suppression des NA car divisions par zero
+
+for (i in 1:nrow(flow_indic))
+  for (j in 1:ncol(flow_indic))
+  {if (is.na.data.frame(flow_indic[i,j])==TRUE) {flow_indic[i,j]<-0}
+  }
+
+
+head(flow_indic)
+
+```
+
+
 Transposition de la matrice
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
@@ -287,7 +354,7 @@ dev.off()
 
 Pour simplifier l'image de ces flux (réduire le nombre de signes représentés), plusieurs possibilités sont envisageables. L'une d'entre elles consiste à sélectionner les signes à représenter en raisonant soit sur les lignes/colonnes de la matrice (donc sur les lieux d'origine/destination) et/ou soit sur le coeur de la matrice (sur les relations). 
 
-Commençons par raisonner sur les lieux
+Commençons par raisonner sur les lieux.
 
 ## Choix d'un pays de référence
 
@@ -409,6 +476,10 @@ dev.off()
 
 <img src = "maps/prop2.png"></img>
 
+Raisonnons maintenant sur les relations entre les lieux.
+
+## Choix des relations avec un pays de référence
+
 Réalisation d'une troisème carte mettant en relation la France avec les pays d'origine des étrangers qui résident sur le territoire national, et pondération de ces liens en fonction du nombre de personnes concernées.
 
 
@@ -433,7 +504,7 @@ links <-
   )
 ```
 
-cartographie de ces liens avec une dimension de largeur proportionnelle à l'effectif de fij
+Cartographie de ces liens avec une dimension de largeur proportionnelle à l'effectif de fij
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 template(
@@ -463,6 +534,8 @@ dev.off()
 ```
 
 <img src = "maps/flows1.png"></img>
+
+La matrice étant orientée, il est possible de raisonner selon les flux entre les lieux, qu'il convient de préparer
 
 # Filtrages et indicateurs
 
