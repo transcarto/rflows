@@ -217,7 +217,7 @@ migr <- migr[,-1]
 knitr::kable(migr[c(0:15),c(0:15)], row.names = T, digits = 1)
 ```
 
-
+**FB: verification si la matrice est carree et calcul indicateurs fondés sur la symétrie**
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
 library("cartograflow")
@@ -254,7 +254,7 @@ tabflow2$i<-as.character(tabflow2$i)
 tabflow2$j<-as.character(tabflow2$j)
 tabflow2$fij<-as.numeric(tabflow2$fij)
 
-# On calcule des indicateurs 
+# On calcule des indicateurs fondés sur la symétrie 
 
 # Volume bilateral as Tobler
 
@@ -267,7 +267,7 @@ flow_net2<-flowtype(tabflow2, origin ="i",destination="j",fij="fij",
                    format="L", x="bibal")
 
 
-#calcule plusieurs indicateurs
+#calcul de plusieurs indicateurs
 flow_indic<-flowtype(tabflow2, origin ="i",destination="j",fij="fij", 
                    format="L", x="alltypes")
 
@@ -278,16 +278,16 @@ for (i in 1:nrow(flow_indic))
   {if (is.na.data.frame(flow_indic[i,j])==TRUE) {flow_indic[i,j]<-0}
   }
 
-
 head(flow_indic)
 
 ```
 
+**>>>> NICO : je ne sais pas si les 3 Chunks suivants sont nécessaires cf. mon chunk precedent **
 
 Transposition de la matrice
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
-migr <- t(migr)
+migr <- t(migr) 
 ```
 
 Passage de la matrice du format large (wide) au format long (liste) i, j, fij
@@ -309,6 +309,14 @@ Sauvegarder du fichier mis en forme au format .csv
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
 write.csv(migr, "data/migr.csv", row.names = FALSE)
 ```
+
+**FB: sauvegarde de la matrice carree et fermée avec des zéros. C'est important car permet de calculer la densité de la matrice (tx de remplissage) = nb de liens renseignes / nb de liens theoriques. Ce qui est un premier indicateur**
+
+Sauvegarder du fichier (matrice carrée incluant les zero) mis en forme au format .csv
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+write.csv(tabflow2, "data/migr2.csv", row.names = FALSE)
+```
+
 
 Ce fichier de données correctement formaté est dorénavant accesible comme ceci.
 
