@@ -137,9 +137,9 @@ dev.off()
 
 <img src = "maps/template.png"></img>
 
-**Données attributaires**
+**Données de flux Origine-Destination**
 
-Nous utilisons un jeu de données sur les migrations internationales. Migration Stock at subregional level, 2019 Source : United Nations, Department of Economic and Social Affairs, Population Division (2019). Celui-ci est proposé au format xls. Nous l'importons et le mettons en forme via le code ci-dessous.
+Nous utilisons un jeu de données sur les migrations internationales. _Migration Stock at subregional level_, 2019 Source : United Nations, Department of Economic and Social Affairs, Population Division (2019). Celui-ci est proposé au format xls. Nous l'importons et le mettons en forme via le code ci-dessous.
 
 > [Voir les données](data/world/UN_MigrantStockByOriginAndDestination_2019.xlsx)
 
@@ -147,7 +147,7 @@ Nous utilisons un jeu de données sur les migrations internationales. Migration 
 
 Téléchargez le fichier [UN_MigrantStockByOriginAndDestination_2019.xlsx](https://raw.githubusercontent.com/transcarto/rflows/master/data/world/UN_MigrantStockByOriginAndDestination_2019.xlsx] ) et placez-le dans votre répertoire data.
 
-Cette opération peut se faire el ligne de code comme suit :
+Cette opération peut se faire avec le code suivant :
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 data_url <-
@@ -182,7 +182,7 @@ for (i in 2:length(colnames(migr))) {
 }
 ```
 
-On affecte les codes ISO du fond du carte en ligne et en colonne
+Affectation des codes ISO du fond du carte en ligne et en colonne
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
 ctr <- countries[,2:4] %>% st_drop_geometry()
@@ -212,13 +212,13 @@ migr <- migr[,-1]
 knitr::kable(migr[c(0:15),c(0:15)], row.names = T, digits = 1)
 ```
 
-On transpose la matrice
+Transposition de la matrice
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 migr <- t(migr)
 ```
 
-Avec *reshape2*, on la convertit au format i,j,fij
+Passage de la matrice du format large (wide) au format long (liste) i, j, fij
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 migr <- melt(migr)
@@ -232,7 +232,7 @@ migr = migr[order(migr$fij, decreasing = TRUE),]
 knitr::kable(migr[c(0:10),], row.names = F, digits = 1)
 ```
 
-Sauvegarder le fichier mis en forme au format csv
+Sauvegarder du fichier mis en forme au format .csv
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
 write.csv(migr, "data/migr.csv", row.names = FALSE)
@@ -244,11 +244,13 @@ Ce fichier de données correctement formaté est dorénavant accesible comme cec
 migr <- read.csv("data/migr.csv")
 ```
 
-Tout est prêt. Avançons...
+Tout est prêt. Avançons ...
 
 # Premières explorations
 
 ## L'effet Spaghetti
+
+Création d'une couche de liens liens correspondant aux cellules renseignées de la matrice migr
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
 links <-
@@ -259,6 +261,7 @@ links <-
     df_id = c("i", "j")
   )
 ```
+
 
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
