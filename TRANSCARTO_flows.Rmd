@@ -141,13 +141,14 @@ dev.off()
 
 Nous utilisons un jeu de données sur les migrations internationales. _Migration Stock at subregional level_, 2019 Source : United Nations, Department of Economic and Social Affairs, Population Division (2019).
 
-Ce jeu décrit l'effectif de populations partie ou acceuillie dans un pays autre que le leur, autorisant ainsi une géovisualisation sous la forme de stocks  et/ou sous la forme de flux de populations étrangères.
-
 Celui-ci est proposé au format xls. Nous l'importons et le mettons en forme via le code ci-dessous.
 
 > [Voir les données](data/world/UN_MigrantStockByOriginAndDestination_2019.xlsx)
 
 <img src ="img/excel.png"></png>
+
+**Précisions sur les données** : Ce jeu décrit l'effectif de populations partie ou acceuillie dans un pays autre que le leur, autorisant ainsi une représentation sous la forme de stocks et/ou sous la forme de flux de populations étrangères. Ces flux mettent en relation des pays de résidence (ceux de destination, placés en lignes dans le fichier .xls) avec des pays d’origine (ceux de départ, placés en colonnes dans le fichier .xls), correspondant à ceux dont les personnes recensées en tant qu’étrangères portent la nationalité. Il reconstruit par là une donnée origine-destination (OD) à partir d'effectifs de migrants que l'on est autorisés de représenter sous la forme de flux. 
+
 
 Téléchargez le fichier [UN_MigrantStockByOriginAndDestination_2019.xlsx](https://raw.githubusercontent.com/transcarto/rflows/master/data/world/UN_MigrantStockByOriginAndDestination_2019.xlsx] ) et placez-le dans votre répertoire data.
 
@@ -290,14 +291,14 @@ Commençons par raisonner sur les lieux
 
 ## Choix d'un pays de référence
 
-Pour simplifier la carte, on peut choisir un seul pays de référence depuis/vers lequel on observe les flux.
+Pour simplifier la carte, choisissons un seul pays de référence depuis/vers lequel on observe les flux.
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 ISO3 <- "FRA"
 label = "France"
 ```
 
-Création d'une sous-matrice migrFRA, jointure et mise en forme des données
+Création d'une sous-matrice migrFRA des flux à destination de la France, jointure et mise en forme des données
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 countr <- countries[, c("adm0_a3_is", "label")]
@@ -328,7 +329,7 @@ library("rmarkdown")
 knitr::kable(countr[c(0:10),], row.names = F, digits = 1)
 ```
 
-Réalisation d'une première carte de stocks sur le nombre d'étrangers en France : ; elle correspond à la somme marginale de la colonne iso3=FRA.
+Réalisation d'une première carte de stocks sur le nombre d'étrangers présents en France : ; elle correspond à la somme marginale de la colonne iso3=FRA.
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 template(paste0("En 2019, il y avait ",total, " millions d'étrangers en France"),
@@ -359,7 +360,7 @@ dev.off()
 
 <img src = "maps/prop1.png"></img>
 
-Réalisation d'une seconde carte de stocks sur le nombre de français à l'étranger ; elle correspond à la somme marginale de la ligne iso3=FRA.
+Création d'une sous-matrice migrFRA des flux originaires de la France, jointure et mise en forme des données
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 countr <- countries[, c("adm0_a3_is", "label")]
@@ -377,6 +378,8 @@ countr <-
 countr <- countr[-3]
 colnames(countr) <- c("id", "label", "fij", "geometry")
 ```
+
+Réalisation d'une seconde carte de stocks sur le nombre de français à l'étranger ; elle correspond à la somme marginale de la ligne iso3=FRA.
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 template(paste0("En 2019, il y avait ",total, " millions de Français à l'étranger"),
@@ -406,7 +409,10 @@ dev.off()
 
 <img src = "maps/prop2.png"></img>
 
-On peut faire la même carte en faisant varier l'épaisseur des liens
+Réalisation d'une troisème carte mettant en relation la France avec les pays d'origine des étrangers qui résident sur le territoire national, et pondération de ces liens en fonction du nombre de personnes concernées.
+
+
+Préparation d'une sous-matrice migrtoFRA formée des liens entrant dans la colonne iso3=FRA.
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 ISO3 <- "FRA"
@@ -414,6 +420,8 @@ label = "France"
 migrtoFRA <- migr[migr$j == ISO3,]
 migrtoFRA$fij <- as.numeric(migrtoFRA$fij)
 ```
+
+Création de la couche de liens correspondante
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 links <-
@@ -424,6 +432,8 @@ links <-
     df_id = c("i", "j")
   )
 ```
+
+cartographie de ces liens avec une dimension de largeur proportionnelle à l'effectif de fij
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 template(
