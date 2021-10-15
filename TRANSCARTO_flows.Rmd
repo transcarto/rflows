@@ -1188,7 +1188,6 @@ migr <- migr[migr$fij >= threshold, ]
 ```
 
 
-
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
 knitr::kable(migr[c(0:10),], row.names = F, digits = 1)
 ```
@@ -1241,7 +1240,7 @@ dev.off()
 
 <img src = "maps/ttt_circles.png"></img>
 
-## Flêches
+## Flèches
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 template("ttt_flowmapper$flows", "maps/ttt_arrows.png")
