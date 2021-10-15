@@ -153,7 +153,7 @@ Celui-ci est proposé au format xls. Nous l'importons et le mettons en forme via
 **Précisions sur les données** : Ce jeu décrit l'effectif de populations partie ou acceuillie dans un pays autre que le leur, autorisant ainsi une représentation sous la forme de stocks et/ou sous la forme de flux de populations étrangères. Ces flux mettent en relation des pays de résidence (ceux de destination, placés en lignes dans le fichier .xls) avec des pays d’origine (ceux de départ, placés en colonnes dans le fichier .xls), correspondant à ceux dont les personnes recensées en tant qu’étrangères portent la nationalité. Il reconstruit par là une donnée origine-destination (OD) à partir d'effectifs de migrants que l'on est autorisés de représenter sous la forme de flux. 
 
 
-Téléchargez le fichier [UN_MigrantStockByOriginAndDestination_2019.xlsx](https://raw.githubusercontent.com/transcarto/rflows/master/data/world/UN_MigrantStockByOriginAndDestination_2019.xlsx] ) et placez-le dans votre répertoire data.
+Téléchargez le fichier [UN_MigrantStockByOriginAndDestination_2019.xlsx](https://raw.githubusercontent.com/transcarto/rflows/master/data/UN_MigrantStockByOriginAndDestination_2019.xlsx] ) et placez-le dans votre répertoire data.
 
 Cette opération peut se faire avec le code suivant :
 
