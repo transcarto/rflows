@@ -1088,7 +1088,7 @@ Cartographie
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 
-template("L'Arique, un continent encore isolé dans la mondialisation", "maps/heran.png")
+template("L'Afrique, un continent encore isolé dans la mondialisation", "maps/heran.png")
 
 col2 = "#4e4f4f"
 
@@ -1154,14 +1154,14 @@ dev.off()
 
 <img src = "maps/heran.png"></img>
 
-Problème : avec seulement mapsf, on a du mal à représenter des flêches et surtout, à la fois des flêches A -> B et B -> A. La solution : Flowmapper 👍
+**Problème : avec seulement mapsf, on a du mal à représenter des flèches et surtout, des flèches bilatérales A -> B et B -> A qui respectent les principes de la sémiologie cartographique des flux en étant parallèles et convergentes/divergentes vers/depuis les lieux. La solution : Flowmapper** 👍
 
 # Flowmapper
 
-flowmapper() est une fonction du package ttt (en cours de développement). 
+flowmapper() est une fonction du package ttt (en cours de développement) dédié à la ré-écriture/extension de programmes initialement proposés par Tobler. 
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
-library(ttt)
+library("ttt")
 ```
 
 ## Les données
@@ -1173,7 +1173,7 @@ subregions <- st_read(system.file("subregions.gpkg", package="flowmapper")) %>% 
 migr <- read.csv(system.file("migrantstocks2019.csv", package="flowmapper"))
 ```
 
-On ne consrve que les flux importants
+Sélection des flux les plus importants
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 threshold <- 1500
