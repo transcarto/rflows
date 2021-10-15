@@ -8,12 +8,14 @@ link_citations: true
   
 ---
 
-**L'objectif de cette séance est de présenter la construction de différentes cartes de flux réalisées décrivant des flux migratoires internationaux observées à l'échelle mondiale. Pour cela, nous mobilisons une matrice de flux origine-destination (OD) internationale (pays * pays) asymétrique, ainsi qu'un fond de carte des pays du monde. Ces données statistiques et géographiques vont être traitées afin d'enrichir la représentation. L'ensemble des étapes est codé dans R, sous une forme qui n'est pas toujours optimisée et beaucoup des traitements réalisés mobilisent {R base}. </br> Le présent document présente l'ensemble de la chaîne de traitement : de la préparation des matrices OD, celle des fonds de carte à la représentation des flux du point de vue de lieux d'origine (ou de destination) et/ou des échanges entre OD, entraînant beaucoup de manipulations. </br> L'idée n'est donc pas de commenter le code _in extenso_, mais d'expliciter une démarche, c'est-à-dire de montrer comment on peut réaliser des cartes de flux dans R selon différentes perspectives, dans le cadre démarche traçable, partageable et reproductible**
+**L'objectif de cette séance est de présenter la construction de différentes cartes de flux décrivant des flux migratoires internationaux observés à l'échelle mondiale. Pour cela, nous mobilisons une matrice de flux origine-destination (OD) internationale (pays * pays) asymétrique, ainsi qu'un fond de carte des pays du monde. Ces données statistiques et géographiques vont être traitées afin d'enrichir la représentation. L'ensemble des étapes est codé dans R, sous une forme qui n'est pas toujours optimisée et beaucoup des traitements réalisés mobilisent {R base}. </br> Le présent document présente l'ensemble de la chaîne de traitement : de la préparation des matrices OD, celle des fonds de carte à la représentation des flux du point de vue de lieux d'origine (ou de destination) et/ou des échanges entre OD, entraînant beaucoup de manipulations. </br> L'idée n'est donc pas de commenter le code _in extenso_, mais d'expliciter une démarche, c'est-à-dire de montrer comment on peut réaliser des cartes de flux dans R selon différentes perspectives, dans le cadre démarche traçable, partageable et reproductible**
 
 
 1. Créez un projet R et un script R.
 2. Créez un repertoire *data* pour stocker les données.
 3. Créez un répertoire *maps* dans lequel seront stockées les cartes
+
+<img src = "img/folders.png"></img>
 
 > Ce document est accessible à l'adresse suivante [https://transcarto.github.io/rflows/TRANSCARTO_flows.html](https://transcarto.github.io/rflows/TRANSCARTO_flows.html)
 
@@ -31,6 +33,7 @@ install.packages("smoothr")
 install.packages("readxl")
 install.packages("comparator")
 install.packages("reshape2")
+install.packages("dplyr")
 library("remotes")
 #install_github("riatelab/mapsf")
 install.packages("mapsf")
@@ -150,7 +153,7 @@ Celui-ci est proposé au format xls. Nous l'importons et le mettons en forme via
 **Précisions sur les données** : Ce jeu décrit l'effectif de populations partie ou acceuillie dans un pays autre que le leur, autorisant ainsi une représentation sous la forme de stocks et/ou sous la forme de flux de populations étrangères. Ces flux mettent en relation des pays de résidence (ceux de destination, placés en lignes dans le fichier .xls) avec des pays d’origine (ceux de départ, placés en colonnes dans le fichier .xls), correspondant à ceux dont les personnes recensées en tant qu’étrangères portent la nationalité. Il reconstruit par là une donnée origine-destination (OD) à partir d'effectifs de migrants que l'on est autorisés de représenter sous la forme de flux. 
 
 
-Téléchargez le fichier [UN_MigrantStockByOriginAndDestination_2019.xlsx](https://raw.githubusercontent.com/transcarto/rflows/master/data/world/UN_MigrantStockByOriginAndDestination_2019.xlsx] ) et placez-le dans votre répertoire data.
+Téléchargez le fichier [UN_MigrantStockByOriginAndDestination_2019.xlsx](https://raw.githubusercontent.com/transcarto/rflows/master/data/UN_MigrantStockByOriginAndDestination_2019.xlsx] ) et placez-le dans votre répertoire data.
 
 Cette opération peut se faire avec le code suivant :
 
@@ -216,74 +219,6 @@ migr <- migr[,-1]
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
 knitr::kable(migr[c(0:15),c(0:15)], row.names = T, digits = 1)
 ```
-
-**FB: verification si la matrice est carree et calcul indicateurs fondés sur la symétrie**
-
-```{r, eval = TRUE, message = FALSE, warning = FALSE}
-library("cartograflow")
-
-tabflow<-migr
-
-#Verification si la matrice est carree et fermee
-
-matflow<-flowtabmat(tabflow,matlist="M")
-
-# Rendre la matrice carree
-#---------------------
-
-# on cree une liste des codes ISO de l'ensemble des entités
-library("dplyr")
-
-liste<-countries%>%select(adm0_a3_is)
-liste<-as.data.frame(liste$adm0_a3_is)
-
-#on s'en sert pour creer la matrice
-
-tabflow2<-flowcarre(tab=tabflow,
-                   liste=liste,
-                   origin = "i", dest="j",valflow="fij",
-                   format="L",
-                   diagonale = TRUE,
-                   empty.sq = FALSE
-)
-
-#on renomme les variables correctement
-colnames(tabflow2)<-c("i", "j", "fij")
-
-tabflow2$i<-as.character(tabflow2$i)
-tabflow2$j<-as.character(tabflow2$j)
-tabflow2$fij<-as.numeric(tabflow2$fij)
-
-# On calcule des indicateurs fondés sur la symétrie 
-
-# Volume bilateral as Tobler
-
-flow_vol2<-flowtype(tabflow2, origin ="i",destination="j",fij="fij", 
-                   format="L",x="bivolum")
-
-# solde/balance bilateral as Tobler
-
-flow_net2<-flowtype(tabflow2, origin ="i",destination="j",fij="fij", 
-                   format="L", x="bibal")
-
-
-#calcul de plusieurs indicateurs
-flow_indic<-flowtype(tabflow2, origin ="i",destination="j",fij="fij", 
-                   format="L", x="alltypes")
-
-#suppression des NA car divisions par zero
-
-for (i in 1:nrow(flow_indic))
-  for (j in 1:ncol(flow_indic))
-  {if (is.na.data.frame(flow_indic[i,j])==TRUE) {flow_indic[i,j]<-0}
-  }
-
-head(flow_indic)
-
-```
-
-**>>>> NICO : je ne sais pas si les 3 Chunks suivants sont nécessaires cf. mon chunk precedent **
-
 Transposition de la matrice
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
@@ -294,10 +229,10 @@ Passage de la matrice du format large (wide) au format long (liste) i, j, fij
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 migr <- melt(migr)
-colnames(migr) = c("i","j","fij")
-migr <- migr[!is.na(migr$fij),]
-migr = migr[migr$fij>0,]
-migr = migr[order(migr$fij, decreasing = TRUE),]
+colnames(migr) = c("i", "j", "fij")
+migr = migr[!is.na(migr$fij), ]
+migr = migr[migr$fij > 0, ]
+migr = migr[order(migr$fij, decreasing = TRUE), ]
 ```
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
@@ -310,18 +245,117 @@ Sauvegarder du fichier mis en forme au format .csv
 write.csv(migr, "data/migr.csv", row.names = FALSE)
 ```
 
-**FB: sauvegarde de la matrice carree et fermée avec des zéros. C'est important car permet de calculer la densité de la matrice (tx de remplissage) = nb de liens renseignes / nb de liens theoriques. Ce qui est un premier indicateur**
+Ce fichier de données correctement formaté est dorénavant accessible comme ceci.
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+migr <- read.csv("data/migr.csv")
+```
+
+Calculs d'indicateurs avec la package *cartograflow*. Ce package, développé par Françoise Bahoken, contient des fonctions permettant de préparer et de filtrer la matrice origine-destination à des fins de cartographie thématique des flux. 
+
+Vérification si la matrice est carrée, car le calcul des indicateurs s'appuie sur la propriété générale de symétrie de la matrice par rapport à la diagonale principale**
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+library("cartograflow")
+```
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+tabflow <- migr
+
+#Verification si la matrice est carree et fermee
+
+matflow <- flowtabmat(tabflow, matlist = "M")
+
+# Rendre la matrice carree
+#---------------------
+
+# on cree une liste des codes ISO de l'ensemble des entités
+library("dplyr")
+
+liste <- countries %>% select(adm0_a3_is)
+liste <- as.data.frame(liste$adm0_a3_is)
+
+#on s'en sert pour creer la matrice
+
+tabflow2 <- flowcarre(
+  tab = tabflow,
+  liste = liste,
+  origin = "i",
+  dest = "j",
+  valflow = "fij",
+  format = "L",
+  diagonale = TRUE,
+  empty.sq = FALSE
+)
+
+#on renomme les variables correctement
+colnames(tabflow2) <- c("i", "j", "fij")
+
+tabflow2$i <- as.character(tabflow2$i)
+tabflow2$j <- as.character(tabflow2$j)
+tabflow2$fij <- as.numeric(tabflow2$fij)
+
+# On calcule des indicateurs fondés sur la symétrie
+
+# Volume bilateral as Tobler
+
+flow_vol2 <- flowtype(
+  tabflow2,
+  origin = "i",
+  destination = "j",
+  fij = "fij",
+  format = "L",
+  x = "bivolum"
+)
+
+# solde/balance bilateral as Tobler
+
+flow_net2 <- flowtype(
+  tabflow2,
+  origin = "i",
+  destination = "j",
+  fij = "fij",
+  format = "L",
+  x = "bibal"
+)
+
+
+#calcul de plusieurs indicateurs
+flow_indic <-
+  flowtype(
+    tabflow2,
+    origin = "i",
+    destination = "j",
+    fij = "fij",
+    format = "L",
+    x = "alltypes"
+  )
+
+#suppression des NA car divisions par zero
+
+for (i in 1:nrow(flow_indic))
+  for (j in 1:ncol(flow_indic))
+  {
+    if (is.na.data.frame(flow_indic[i, j]) == TRUE) {
+      flow_indic[i, j] <- 0
+    }
+  }
+
+head(flow_indic)
+
+```
+
+Sauvegarde de la matrice carree et fermée avec des zéros. C'est important car permet de calculer la densité de la matrice (tx de remplissage) = nb de liens renseignes / nb de liens theoriques. Ce qui est un premier indicateur**
 
 Sauvegarde du fichier (matrice carrée incluant les zero) mis en forme au format .csv
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
 write.csv(tabflow2, "data/migr2.csv", row.names = FALSE)
 ```
 
-
 Ce fichier de données correctement formaté est dorénavant accesible comme ceci.
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
-migr <- read.csv("data/migr.csv")
+tabflow2 <- read.csv("data/migr2.csv")
 ```
 
 Tout est prêt. Avançons ...
@@ -330,7 +364,10 @@ Tout est prêt. Avançons ...
 
 On considère la matrice migr : elle est formée de 11305 couples d'OD et de 3 variables.
 
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+migr <- read.csv("data/migr.csv")
 dim(migr)
+```
 
 ## L'effet Spaghetti
 
@@ -395,12 +432,6 @@ colnames(countr) <- c("id", "label", "fij", "geometry")
 
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
-install.packages("knitr")
-install.packages("rmarkdown")
-
-library("knitr")
-library("rmarkdown")
-
 knitr::kable(countr[c(0:10),], row.names = F, digits = 1)
 ```
 
@@ -532,7 +563,7 @@ mf_map(
   leg_title = "Nombre de personnes"
 )
 mf_map(
-  countries[countries$adm0_a3_is == ISO3,],
+  countries[countries$adm0_a3_is == ISO3, ],
   col = "#4e4f4f",
   border = col,
   lwd = 1.5,
@@ -547,9 +578,7 @@ La matrice étant orientée, il est possible de raisonner selon les flux entre l
 
 # Filtrages et indicateurs
 
-**FRANCOISE, TU METS TES TRUCS ICI !**
-
-**Le principe général est de sélectionner les liens à représenter pour ne représenter que ceux jugés "significatifs". Le filtrage peut être soit global (on applique une valeur unique en deça/au-dessus de laquelle les flux ne seront pas représentés ou soit local, concernant les lieux.**
+**Le principe général est de sélectionner les liens à représenter pour ne représenter que ceux jugés "significatifs". Le filtrage peut être soit global (on applique une valeur unique en deça/au-dessus de laquelle les flux ne seront pas représentés) ou soit local, concernant les lieux (on filtre les flux en fonction de considérations sur les l'origie et/ou la destination).**
 
 ## Application d'un critère global
 
@@ -557,27 +586,21 @@ Tobler indique que seuls les flux supérieurs à la moyenne devront être repré
 On peut faire un test. Ce critère n'est pas toujours suffisant, car dépend de la densité de la matrice. Il est plus prudent de sélectionner un critère selon les quantile.
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
- 
-fij<-(tabflow2$fij)
 
-mean<-mean(fij)     #as Tobler
+tabflow2 <- read.csv("data/migr2.csv")
+
+fij <- (tabflow2$fij)
+
+mean <- mean(fij)     #as Tobler
 
 #Q3<-quantile(flow$fij,0.75)   #25% of the most important migrations
 #Q95<-quantile(flow$fij, 0.95) # 5% of the most important migrations
 #Q98<-quantile(flow$fij, 0.98) # 2% of the most important migrations
 
 
-max<-max(tabflow2$fij)
-
 ```
 
 Flux supérieurs à la moyenne
-
-
-
-
-
-
 
 
 
@@ -587,7 +610,7 @@ Flux supérieurs à la moyenne
 
 Avec le code ci-dessous, on cherche à réaliser une carte à la façon de cette application interactive.
 
-> https://analytics.huma-num.fr/Nicolas.Lambert/migrexplorer/
+> [migrExplorer](https://analytics.huma-num.fr/Nicolas.Lambert/migrexplorer/)
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 ISO3 <- "FRA"
@@ -620,7 +643,7 @@ knitr::kable(countr[c(0:10),], row.names = F, digits = 1)
 Cercles avec packcircles (Dorling style)
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
-library(packcircles)
+library("packcircles")
 ```
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
@@ -745,7 +768,7 @@ dev.off()
 
 <img src = "maps/migrexplorer1.png"></img>
 
-Comme précédemment, on peut faire la carte en symétrie en inversant i et j.
+Comme précédemment, on peut faire la carte des français présents à l'étranger, en regardant la destination
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 ISO3 <- "FRA"
@@ -898,13 +921,13 @@ Ces cartes, on peut les retrouver dans l'application MigrExplorer mise en ligne 
 
 ## Changer de maillage
 
-Contrairement aux cartes pays * pays, cartographier les flux au niveau régional permet de mieux percevoir la logique des mobilités internationales. Cette carte, pas très élégantes, a été réalisée et présentée par François Héron pour ses cours au Collège de France. 
+Contrairement aux cartes réalisées à l'échelle internationale (pays * pays), cartographier les flux au niveau régional permet parfois de mieux percevoir la logique d'ensemble de ces mobilités internationales. Cette carte, pas très élégante, a été réalisée et présentée par François Héran dans ses cours au Collège de France. 
 
 <img src = "img/f11.png"></img>
 
-Et si on esseyait de la reproduire en R ?
+Et si on essayait de la reproduire avec R ?
 
-Pour celà, nous fabriquons des données au niveau subrégional à partir d'une clé d'aggrégations contenu dans le ficher *countries*.
+Pour cela, nous construisons des données de migrations internationales, en agrégeant les flux internationaux au niveau subrégional, à partir d'une clé d'aggrégation contenue dans le fichier *countries*.
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
 knitr::kable(countries[c(0:10),c("adm0_a3_is", "label","Code2","Label2")], row.names = F, digits = 1)
@@ -984,7 +1007,7 @@ subregions <- merge(x = subregions, y = flowsintra, by = "id")
 knitr::kable(subregions[c(0:10),], row.names = F, digits = 1)
 ```
 
-Calcul des interactions inter régionales (A -> B) + (B -> A)
+Calcul du volume bilatéral d'interactions inter régionales (A -> B) + (B -> A) ou (fij)+(fji)
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 migr2 <- migr2[migr2$i != migr2$j,]
@@ -1023,14 +1046,22 @@ knitr::kable(interactions[c(0:10),], row.names = F, digits = 1)
 ```
 
 
-On élimine les petits flux
+On élimine les petits flux, c'est-à-dire les signes graphiques présentant des valeurs de flux faibles
+
+Pour cela, on décide de ne représenter que les 10% de signes qui contribuent à l'interaction totale la plus forte
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
+Q90<-quantile(interactions$interaction, 0.90)  #10% des migrations les plus importantes
+```
+
+Pour simplifier, on fixe le critère de sélection à 2000
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 threshold <- 2000
 interactions <- interactions[interactions$interaction >= threshold,]
 ```
 
-Calcul des liens
+construction des liens inter regionaux
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 links <-
@@ -1193,7 +1224,7 @@ dev.off()
 ## Flêches
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
-template("ttt_flowmapper$flows", "maps/ttt_flows.png")
+template("ttt_flowmapper$flows", "maps/ttt_arrows.png")
 mf_map(
   subregions,
   col = "#4e4f4f",
@@ -1210,7 +1241,7 @@ dev.off()
 ## Visualisation par défaut
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
-template("flowmappze", "maps/ttt_flows.png")
+template("Visulaisation par défaut", "maps/ttt_flows.png")
 mf_map(
   subregions,
   col = "#4e4f4f",
@@ -1230,7 +1261,6 @@ flows <- ttt_flowmapper(
   border2 = col,
   add = TRUE
 )
-ttt_flowmapperlegend(x = flows, title = "Flux", col = col)
 dev.off()
 ```
 
@@ -1297,7 +1327,7 @@ head(migr2)
 
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
-template("tInteractions", "maps/ttt_interactions.png")
+template("Interactions", "maps/ttt_interactions.png")
 c <- ttt_flowmapper(
   x = subregions,
   xid = "id",
@@ -1402,6 +1432,15 @@ mf_label(
   lines = FALSE
 )
 
+# La fonction légende :-)
+
+ttt_flowmapperlegend(
+  x = flows,
+  title = "Flux inter",
+  title2 = "flux intra",
+  col = "#4e4f4f",
+  txtcol = col
+)
 
 
 dev.off()
