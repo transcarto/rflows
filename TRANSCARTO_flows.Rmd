@@ -566,6 +566,7 @@ mean<-mean(fij)     #as Tobler
 #Q95<-quantile(flow$fij, 0.95) # 5% of the most important migrations
 #Q98<-quantile(flow$fij, 0.98) # 2% of the most important migrations
 
+
 max<-max(tabflow2$fij)
 
 ```
