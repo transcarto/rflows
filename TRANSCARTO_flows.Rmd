@@ -15,6 +15,8 @@ link_citations: true
 2. Créez un repertoire *data* pour stocker les données.
 3. Créez un répertoire *maps* dans lequel seront stockées les cartes
 
+<img src = "img/folders.png"></img>
+
 > Ce document est accessible à l'adresse suivante [https://transcarto.github.io/rflows/TRANSCARTO_flows.html](https://transcarto.github.io/rflows/TRANSCARTO_flows.html)
 
 > Le code source est disponible ici [https://github.com/transcarto/rflows](https://github.com/transcarto/rflows)
@@ -31,6 +33,7 @@ install.packages("smoothr")
 install.packages("readxl")
 install.packages("comparator")
 install.packages("reshape2")
+install.packages("dplyr")
 library("remotes")
 #install_github("riatelab/mapsf")
 install.packages("mapsf")
@@ -216,74 +219,6 @@ migr <- migr[,-1]
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
 knitr::kable(migr[c(0:15),c(0:15)], row.names = T, digits = 1)
 ```
-
-**FB: verification si la matrice est carree et calcul indicateurs fondés sur la symétrie**
-
-```{r, eval = TRUE, message = FALSE, warning = FALSE}
-library("cartograflow")
-
-tabflow<-migr
-
-#Verification si la matrice est carree et fermee
-
-matflow<-flowtabmat(tabflow,matlist="M")
-
-# Rendre la matrice carree
-#---------------------
-
-# on cree une liste des codes ISO de l'ensemble des entités
-library("dplyr")
-
-liste<-countries%>%select(adm0_a3_is)
-liste<-as.data.frame(liste$adm0_a3_is)
-
-#on s'en sert pour creer la matrice
-
-tabflow2<-flowcarre(tab=tabflow,
-                   liste=liste,
-                   origin = "i", dest="j",valflow="fij",
-                   format="L",
-                   diagonale = TRUE,
-                   empty.sq = FALSE
-)
-
-#on renomme les variables correctement
-colnames(tabflow2)<-c("i", "j", "fij")
-
-tabflow2$i<-as.character(tabflow2$i)
-tabflow2$j<-as.character(tabflow2$j)
-tabflow2$fij<-as.numeric(tabflow2$fij)
-
-# On calcule des indicateurs fondés sur la symétrie 
-
-# Volume bilateral as Tobler
-
-flow_vol2<-flowtype(tabflow2, origin ="i",destination="j",fij="fij", 
-                   format="L",x="bivolum")
-
-# solde/balance bilateral as Tobler
-
-flow_net2<-flowtype(tabflow2, origin ="i",destination="j",fij="fij", 
-                   format="L", x="bibal")
-
-
-#calcul de plusieurs indicateurs
-flow_indic<-flowtype(tabflow2, origin ="i",destination="j",fij="fij", 
-                   format="L", x="alltypes")
-
-#suppression des NA car divisions par zero
-
-for (i in 1:nrow(flow_indic))
-  for (j in 1:ncol(flow_indic))
-  {if (is.na.data.frame(flow_indic[i,j])==TRUE) {flow_indic[i,j]<-0}
-  }
-
-head(flow_indic)
-
-```
-
-**>>>> NICO : je ne sais pas si les 3 Chunks suivants sont nécessaires cf. mon chunk precedent **
-
 Transposition de la matrice
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
@@ -294,10 +229,10 @@ Passage de la matrice du format large (wide) au format long (liste) i, j, fij
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 migr <- melt(migr)
-colnames(migr) = c("i","j","fij")
-migr <- migr[!is.na(migr$fij),]
-migr = migr[migr$fij>0,]
-migr = migr[order(migr$fij, decreasing = TRUE),]
+colnames(migr) = c("i", "j", "fij")
+migr = migr[!is.na(migr$fij), ]
+migr = migr[migr$fij > 0, ]
+migr = migr[order(migr$fij, decreasing = TRUE), ]
 ```
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
@@ -310,18 +245,117 @@ Sauvegarder du fichier mis en forme au format .csv
 write.csv(migr, "data/migr.csv", row.names = FALSE)
 ```
 
-**FB: sauvegarde de la matrice carree et fermée avec des zéros. C'est important car permet de calculer la densité de la matrice (tx de remplissage) = nb de liens renseignes / nb de liens theoriques. Ce qui est un premier indicateur**
+Ce fichier de données correctement formaté est dorénavant accesible comme ceci.
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+migr <- read.csv("data/migr.csv")
+```
+
+Calculs d'indicateurs avec la package *cartograflow*. Ce package, développé par Françoise Bahoken, contient des fonctions permettant de préparer et de filtrer la matrice origine-destination à des fins de cartographie thématique des flux. 
+
+**FB: verification si la matrice est carree et calcul indicateurs fondés sur la symétrie**
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+library("cartograflow")
+```
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+tabflow <- migr
+
+#Verification si la matrice est carree et fermee
+
+matflow <- flowtabmat(tabflow, matlist = "M")
+
+# Rendre la matrice carree
+#---------------------
+
+# on cree une liste des codes ISO de l'ensemble des entités
+library("dplyr")
+
+liste <- countries %>% select(adm0_a3_is)
+liste <- as.data.frame(liste$adm0_a3_is)
+
+#on s'en sert pour creer la matrice
+
+tabflow2 <- flowcarre(
+  tab = tabflow,
+  liste = liste,
+  origin = "i",
+  dest = "j",
+  valflow = "fij",
+  format = "L",
+  diagonale = TRUE,
+  empty.sq = FALSE
+)
+
+#on renomme les variables correctement
+colnames(tabflow2) <- c("i", "j", "fij")
+
+tabflow2$i <- as.character(tabflow2$i)
+tabflow2$j <- as.character(tabflow2$j)
+tabflow2$fij <- as.numeric(tabflow2$fij)
+
+# On calcule des indicateurs fondés sur la symétrie
+
+# Volume bilateral as Tobler
+
+flow_vol2 <- flowtype(
+  tabflow2,
+  origin = "i",
+  destination = "j",
+  fij = "fij",
+  format = "L",
+  x = "bivolum"
+)
+
+# solde/balance bilateral as Tobler
+
+flow_net2 <- flowtype(
+  tabflow2,
+  origin = "i",
+  destination = "j",
+  fij = "fij",
+  format = "L",
+  x = "bibal"
+)
+
+
+#calcul de plusieurs indicateurs
+flow_indic <-
+  flowtype(
+    tabflow2,
+    origin = "i",
+    destination = "j",
+    fij = "fij",
+    format = "L",
+    x = "alltypes"
+  )
+
+#suppression des NA car divisions par zero
+
+for (i in 1:nrow(flow_indic))
+  for (j in 1:ncol(flow_indic))
+  {
+    if (is.na.data.frame(flow_indic[i, j]) == TRUE) {
+      flow_indic[i, j] <- 0
+    }
+  }
+
+head(flow_indic)
+
+```
+
+Sauvegarde de la matrice carree et fermée avec des zéros. C'est important car permet de calculer la densité de la matrice (tx de remplissage) = nb de liens renseignes / nb de liens theoriques. Ce qui est un premier indicateur**
 
 Sauvegarde du fichier (matrice carrée incluant les zero) mis en forme au format .csv
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
 write.csv(tabflow2, "data/migr2.csv", row.names = FALSE)
 ```
 
-
 Ce fichier de données correctement formaté est dorénavant accesible comme ceci.
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
-migr <- read.csv("data/migr.csv")
+tabflow2 <- read.csv("data/migr2.csv")
 ```
 
 Tout est prêt. Avançons ...
@@ -330,7 +364,10 @@ Tout est prêt. Avançons ...
 
 On considère la matrice migr : elle est formée de 11305 couples d'OD et de 3 variables.
 
+```{r, eval = TRUE, message = FALSE, warning = FALSE}
+migr <- read.csv("data/migr.csv")
 dim(migr)
+```
 
 ## L'effet Spaghetti
 
@@ -395,12 +432,6 @@ colnames(countr) <- c("id", "label", "fij", "geometry")
 
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE}
-install.packages("knitr")
-install.packages("rmarkdown")
-
-library("knitr")
-library("rmarkdown")
-
 knitr::kable(countr[c(0:10),], row.names = F, digits = 1)
 ```
 
@@ -532,7 +563,7 @@ mf_map(
   leg_title = "Nombre de personnes"
 )
 mf_map(
-  countries[countries$adm0_a3_is == ISO3,],
+  countries[countries$adm0_a3_is == ISO3, ],
   col = "#4e4f4f",
   border = col,
   lwd = 1.5,
@@ -547,8 +578,6 @@ La matrice étant orientée, il est possible de raisonner selon les flux entre l
 
 # Filtrages et indicateurs
 
-**FRANCOISE, TU METS TES TRUCS ICI !**
-
 **Le principe général est de sélectionner les liens à représenter pour ne représenter que ceux jugés "significatifs". Le filtrage peut être soit global (on applique une valeur unique en deça/au-dessus de laquelle les flux ne seront pas représentés ou soit local, concernant les lieux.**
 
 ## Application d'un critère global
@@ -557,26 +586,22 @@ Tobler indique que seuls les flux supérieurs à la moyenne devront être repré
 On peut faire un test. Ce critère n'est pas toujours suffisant, car dépend de la densité de la matrice. Il est plus prudent de sélectionner un critère selon les quantile.
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
- 
-fij<-(tabflow2$fij)
 
-mean<-mean(fij)     #as Tobler
+tabflow2 <- read.csv("data/migr2.csv")
+
+fij <- (tabflow2$fij)
+
+mean <- mean(fij)     #as Tobler
 
 #Q3<-quantile(flow$fij,0.75)   #25% of the most important migrations
 #Q95<-quantile(flow$fij, 0.95) # 5% of the most important migrations
 #Q98<-quantile(flow$fij, 0.98) # 2% of the most important migrations
 
-max<-max(tabflow2$fij)
+max <- max(tabflow2$fij)
 
 ```
 
 Flux supérieurs à la moyenne
-
-
-
-
-
-
 
 
 
