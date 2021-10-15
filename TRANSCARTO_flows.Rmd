@@ -1045,10 +1045,21 @@ for (k in 1:length(migr2$i)) {
 knitr::kable(interactions[c(0:10),], row.names = F, digits = 1)
 ```
 
+**Choix du critère de sélection global**
 
-On élimine les petits flux, c'est-à-dire les signes graphiques présentant des valeurs de flux faibles
+On décide d'éliminer les petits flux, c'est-à-dire les signes graphiques présentant des valeurs de flux faibles pour ne pas se trouver face à un effet spaghetti.
 
-Pour cela, on décide de ne représenter que les 10% de signes qui contribuent à l'interaction totale la plus forte
+Tobler recommande en première intention de ne représenter que les flux qui sont supérieurs au flux moyen 
+
+```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
+mean<-mean(interactions$interaction)
+```
+
+Cependant, ce seuil à 829 personnes (flux interregional moyen) ne nous apparaît pas assez élevé car 1) il n'éclaircit pas suffisament la figure et 2) il ne nous  permet pas de coller suffisament à la carte de F. Héran.
+
+Nous changeons de logique et raisonnons selon les posiions, les déciles, pour ne représenter que la part en % de flux qui contribuent à une visualisation d'une part importante de l'interaction totale.  
+
+Nous décidons alors de ne représenter que les 10% de signes qui contribuent à l'interaction totale la plus forte
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
 Q90<-quantile(interactions$interaction, 0.90)  #10% des migrations les plus importantes
