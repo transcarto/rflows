@@ -1217,7 +1217,7 @@ dev.off()
 ## Flêches
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
-template("ttt_flowmapper$flows", "maps/ttt_flows.png")
+template("ttt_flowmapper$flows", "maps/ttt_arrows.png")
 mf_map(
   subregions,
   col = "#4e4f4f",
@@ -1234,7 +1234,7 @@ dev.off()
 ## Visualisation par défaut
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
-template("flowmappze", "maps/ttt_flows.png")
+template("Visulaisation par défaut", "maps/ttt_flows.png")
 mf_map(
   subregions,
   col = "#4e4f4f",
@@ -1254,7 +1254,6 @@ flows <- ttt_flowmapper(
   border2 = col,
   add = TRUE
 )
-ttt_flowmapperlegend(x = flows, title = "Flux", col = col)
 dev.off()
 ```
 
@@ -1321,7 +1320,7 @@ head(migr2)
 
 
 ```{r, eval = TRUE, message = FALSE, warning = FALSE, results = "hide"}
-template("tInteractions", "maps/ttt_interactions.png")
+template("Interactions", "maps/ttt_interactions.png")
 c <- ttt_flowmapper(
   x = subregions,
   xid = "id",
@@ -1426,6 +1425,15 @@ mf_label(
   lines = FALSE
 )
 
+# La fonction légende :-)
+
+ttt_flowmapperlegend(
+  x = flows,
+  title = "Flux inter",
+  title2 = "flux intra",
+  col = "#4e4f4f",
+  txtcol = col
+)
 
 
 dev.off()
