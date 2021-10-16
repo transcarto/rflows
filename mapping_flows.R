@@ -288,10 +288,11 @@ head(tab.distance)
 # 2) Réduction de la matrice de flux en fonction de critères distances parcourues
 # critères de distance minimum ou de distance maximum
 
-Q1<-quantile(tab.distance$distance,0.25)   #25% des distances les plus courtes
-Q10<-quantile(tab.distance$distance,0.10)
+#Q1<-quantile(tab.distance$distance,0.25)   #25% des distances les plus courtes
+Q10<-quantile(tab.distance$distance,0.10)   #10% des distances les plus courtes
 
 # On va utiliser le paramètre  "dmax" distance pour réduire la matrice
+# Possibilité d'utiliser "dmin" pour une distance minimale à parcourir
 
 tab.flow<-flowreduct(tabflow,
                      tab.distance,
@@ -308,11 +309,8 @@ flow.distQ10<-tab.flow %>%
 head(flow.distQ10)
 
 
-#3) cartographie des flux parcourant moins de 5100 km
+#3) cartographie des flux parcourant moins de 2500 km
 #----------------------------
-
-
-# les flux de moins de 
 
 
 source <- "United Nations, Department of Economic and Social Affairs, Population Division (2019)"
@@ -337,7 +335,7 @@ plot(st_geometry(land), col=NA, border = "#317691", lwd = 1, add=T)
 x <- -16300000 ; y <- 12250000
 
 
-# Flowmap : flow travelled less than  (Q1)
+# Flowmap : flow travelled less than 2500
 
 head(flow.distQ10)
 
@@ -378,7 +376,91 @@ layoutLayer(title = " Flux ayant parcouru moins de 2500 km",
 dev.off()
 
 
+#4) cartographie des flux parcourant au moins 150000 km
+#----------------------------
 
+# choix du critère
+
+head(tab.distance)
+summary(tab.distance$distance)
+
+tab.flow_dmin<-flowreduct(tabflow,
+                     tab.distance,
+                     metric = "continous",
+                     d.criteria = "dmin",  
+                     d = 13994888)        
+
+
+head(tab.flow_dmin)
+
+
+#select for all i,j flow values above to 0
+
+flow.dist_min<-tab.flow_dmin%>%
+  select(i,j,flowfilter, distance)%>%
+  filter(flowfilter !=0)
+
+
+# Flowmap : flux parcourant plus de 13000 km
+
+source <- "United Nations, Department of Economic and Social Affairs, Population Division (2019)"
+authors <- "Françoise Bahoken & Nicolas Lambert, 2021"
+
+# Graphic parameters
+par(mar=c(0,0,1,0))
+
+sizes <- getFigDim(x = countries, width = 1500,mar = c(0,0,0,0), res = 150)
+png("maps/flow_sup13000km.png", width = sizes[1], height = sizes[2], res = 150)
+
+# Overlay a spatial background 
+par(bg = "NA")
+
+plot(st_geometry(countries), col=NA, border=NA)
+
+plot(st_geometry(bbox), col="#d5ebf2", border=NA, add=T)
+plot(st_geometry(graticule), col = "white",lwd=1, add=T)
+plot(st_geometry(countries), col="#e3d0c1", border = "white", add=T)
+plot(st_geometry(land), col=NA, border = "#317691", lwd = 1, add=T)
+
+x <- -16300000 ; y <- 12250000
+
+head(flow.dist_min)
+
+flowmap(tab=flow.dist_min,
+        fij="flowfilter",origin.f = "i",destination.f = "j",
+        bkg = map,code="adm0_a3_is",nodes.X="X",nodes.Y = "Y",
+        filter=TRUE,
+        taille=8,           
+        a.head = 1,  #fleche
+        a.length = 0.11,
+        a.col="#f7714f",
+        add=TRUE)
+
+
+legendPropLines(pos="bottomright",
+                title.txt="Nombre de migrants\n(distance parcourue inférieure à 2500 km)",
+                title.cex=0.8,    
+                cex=0.5,
+                values.cex= 0.7,  
+                var=c(min(flow.distQ10$flowfilter),2500), 
+                var=c(13994888, max(flow.dist_min$flowfilter)), 
+                col="#f7714f",
+                lwd=8,
+                frame = FALSE,
+                values.rnd = 0
+)
+
+#Map cosmetic
+
+layoutLayer(title = " Flux ayant parcouru plus de 13000 km",
+            author <- authors,
+            sources <- source,
+            tabtitle = T,
+            frame = TRUE,
+            col = "#636363") # coltitle ="#636363"
+
+
+dev.off()
 
 
 #------------------------------------------
