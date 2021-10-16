@@ -485,9 +485,77 @@ dev.off()
 # k: un nombre k (k:1,2,...,k)de limites de zones entre OD. 
 # Si k=1, les OD partagent une limite de zone
 
+#Tobler suggère k=4 contiguités pour délimiter les migrations à courte distance
 
+# 1) Création de graphes de voisinages
+#------------------------------------------
 
+#install.packages("igraph")
+library(igraph)
 
+## Neighbouring graph (ordre 1)
+
+# réseau de pays limitrophes
+graph_ckij_1<-flowcontig(bkg=countries, code="adm0_a3_is",
+                         k=1, algo = "automatic")
+
+# réseau de pays limitrophes séparés par 4 frontières maximum
+graph_ckij_4<-flowcontig(bkg=countries, code="adm0_a3_is",
+                         k=4, algo = "automatic")
+
+head(graph_ckij_4)
+plot(graph_ckij_4)
+
+#Visualisation du graphe
+
+flowmap(tab=graph_ckij_1,
+        fij="ordre",origin.f = "i",destination.f = "j",
+        bkg = map,code="adm0_a3_is",nodes.X="X",nodes.Y = "Y",
+        filter=FALSE)
+
+#flowmap(tab=graph_ckij_4,
+#        fij="ordre",origin.f = "i",destination.f = "j",
+#        bkg = map,code="adm0_a3_is",nodes.X="X",nodes.Y = "Y",
+#        filter=FALSE)
+
+# 2) Réduction de la matrice en fonction du graghe de voisinage
+
+flow_reduc_k1<-flowreduct(flow,
+                     graph_ckij_1,
+                     metric = "ordinal")
+head(flow_reduc_k1)
+
+# 3) Flowmap entre pays adjacents
+
+flowmap(tab=flow_reduc_k1,
+        fij="flow",origin.f = "i",destination.f = "j",
+        bkg = countries,code="adm0_a3_is",nodes.X="X",nodes.Y = "Y",
+        filter=TRUE,
+        taille=8,
+        a.head = 1,
+        a.length = 0.11,
+        a.col="#0e7fe3",
+        add=TRUE
+)
+# Map Legend
+legendPropLines(pos="bottom right",
+                title.txt="Flux de migrants entre voisins\n(k=1)",
+                title.cex=0.8,    
+                cex=0.5,
+                values.cex= 0.7,  
+                var=c(min(flow_reduc_k1$flow),max(flow_reduc_k1$flow)), 
+                col="#0e7fe3",
+                lwd=8, 
+                frame = FALSE,
+                values.rnd = 0
+)
+# Map cosmetic
+layoutLayer(title = " Flux de migrants entre pays voisins",
+            author <- authors,
+            sources <- source,
+            tabtitle = T,
+            frame = TRUE,
+            col = "#636363") # coltitle ="#636363"
 
 
 #------------------------------------------
