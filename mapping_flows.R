@@ -1,6 +1,7 @@
 
+
 # --------------------------
-# FLOWMAP supérieur à un critère global (moyenne, quantile, etc.)
+# Cartograflow : filtrer pour cartographier des flux 
 # --------------------------
 
 #setwd("D:/R/github/transcarto/rflows")
@@ -17,7 +18,7 @@ library("cartograflow")
 # Import data
 #----------------------------
 
-#geom
+# geographie
 
 countries <- st_read("data/world/geom/countries.gpkg")
 
@@ -30,7 +31,6 @@ pt<- read.csv2("data/world/geom/XYcountries.csv",
 graticule <- st_read("data/world/geom/graticule.gpkg")
 bbox <- st_read("data/world/geom/bbox.gpkg")
 
-
 #flows
 
 flow<- read.csv2("./data/migr.csv",
@@ -38,7 +38,7 @@ flow<- read.csv2("./data/migr.csv",
                  stringsAsFactors=FALSE,
                  encoding="UTF-8",dec=".", check.names=FALSE)
 
-# Variable typing
+# Typage des variables
 countries$adm0_a3_is<-as.character(countries$adm0_a3_is)
 
 flow$i<-as.character(flow$i)
@@ -46,7 +46,7 @@ flow$j<-as.character(flow$j)
 flow$fij<-as.numeric(flow$fij)
 
 
-# Map projection
+# Projection cartographique
 #----------------------------
 
 crs <- "+proj=aeqd +lat_0=90 +lon_0=50 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs "
@@ -56,6 +56,101 @@ bbox <- st_transform(x = bbox, crs = crs)
 land <- st_union(countries)
 
 st_as_sf(x = pt,coords = c("X", "Y"),crs = crs)
+
+
+# --------------------------
+# MAP 0 - visualisation générale pour explorer des cartes de flux
+#--------------------------
+# flowmap() : fonction de visualisation de matrice de flux OD,
+# sous la forme de segments ou de flèches
+# filter : indiquer si les flux sont filtrés ou non
+# threshold : valeur du seuil de filtrage si filter="TRUE"
+# taille : largeur du signe linéaire (ligne/flèche)
+# a. head : sens de la tête de flux si nécessaire (0=sans flèche, 1=in, 2=out, 3=in et out)
+# a.length : longueur des bras de la tête (en pouces 1p=25,4 mm)
+# a.angle : angle formé entre le corps et la tête de flèche
+# a.col : couleur de la flèche/ligne
+# add : autorise la superposition des motifs de flux avec d'autres plans (ex. un fond de carte) 
+
+# flowmapping Spaghetti-effect
+#---------------------------------
+
+flowmap(tab=flow,
+        origin.f = "i",
+        destination.f = "j",
+        nodes= pt,
+        code="adm0_a3_is",
+        nodes.X="X",
+        nodes.Y="Y",
+        filter=F  #pas de filtre
+        )
+
+
+# Flowmapper le volume bilatéral des flux : exploration
+##-----------------
+
+head(flow_vol)
+
+#suppression de toutes les cases à zéro
+
+flow_vol<- flow_vol%>%
+  filter(fij !=0)
+
+# Résumé statistique (pour rechercher rapidement un seuil de filtrage)
+summary(flow_vol$fij)
+
+# Fonction flowmap
+
+flowmap(tab=flow_vol,
+        origin.f = "i",
+        destination.f = "j",
+        nodes= pt,
+        code="adm0_a3_is",
+        nodes.X="X",
+        nodes.Y="Y",
+        filter=T,            # on autorise le filtrage
+        threshold=quantile(flow_vol$fij,0.95),     # valeur du filtre
+        taille=15,           # largeur du signe
+        a.head=0,            # pas de tête de flèche      
+        a.length = 0.09,
+        a.col="#383e47",
+        
+)
+
+
+# Fonction flowmap avec fond de carte
+#-------------------------------------
+
+
+# genère un fond vide
+par(bg = "NA")
+
+plot(st_geometry(countries), col=NA, border=NA, bg="#caecfa") #dfe6e1
+
+#plot(st_geometry(bbox), col="#d5ebf2", border=NA, add=T)
+plot(st_geometry(graticule), col = "white",lwd=1, add=T)
+plot(st_geometry(countries), col="#f5df87", border = "white", add=T)
+#plot(st_geometry(land), col=NA, border = "#317691", lwd = 1, add=T)
+
+
+flowmap(tab=flow_vol,
+        origin.f = "i",
+        destination.f = "j",
+        nodes= pt,
+        code="adm0_a3_is",
+        nodes.X="X",
+        nodes.Y="Y",
+        filter=T,            # on autorise le filtrage
+        threshold=quantile(flow_vol$fij,0.95),     # valeur du filtre
+        taille=15,           # largeur du signe
+        a.head=0,            # pas de tête de flèche      
+        a.length = 0.09,
+        a.col="#423e2a",
+        add=TRUE             # autoriser les superpositions
+        
+)
+
+
 
 #-------------------------------
 # Map 1 : Migrations up to a global criterion
@@ -520,12 +615,34 @@ flowmap(tab=graph_ckij_1,
 
 # 2) Réduction de la matrice en fonction du graghe de voisinage
 
+
 flow_reduc_k1<-flowreduct(flow,
                      graph_ckij_1,
                      metric = "ordinal")
 head(flow_reduc_k1)
 
 # 3) Flowmap entre pays adjacents
+
+source <- "United Nations, Department of Economic and Social Affairs, Population Division (2019)"
+authors <- "Françoise Bahoken & Nicolas Lambert, 2021"
+
+# Graphic parameters
+par(mar=c(0,0,1,0))
+
+sizes <- getFigDim(x = countries, width = 1500,mar = c(0,0,0,0), res = 150)
+png("maps/flow_adjacents.png", width = sizes[1], height = sizes[2], res = 150)
+
+# Overlay a spatial background 
+par(bg = "NA")
+
+plot(st_geometry(countries), col=NA, border=NA)
+
+plot(st_geometry(bbox), col="#d5ebf2", border=NA, add=T)
+plot(st_geometry(graticule), col = "white",lwd=1, add=T)
+plot(st_geometry(countries), col="#e3d0c1", border = "white", add=T)
+plot(st_geometry(land), col=NA, border = "#317691", lwd = 1, add=T)
+
+x <- -16300000 ; y <- 12250000
 
 flowmap(tab=flow_reduc_k1,
         fij="flow",origin.f = "i",destination.f = "j",
@@ -556,6 +673,8 @@ layoutLayer(title = " Flux de migrants entre pays voisins",
             tabtitle = T,
             frame = TRUE,
             col = "#636363") # coltitle ="#636363"
+
+dev.off()
 
 
 #------------------------------------------
