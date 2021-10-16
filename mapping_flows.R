@@ -254,7 +254,7 @@ dev.off()
 
 #-------------------------------
 # Map 3 : Migrations filtrées sur la distance
-#
+# Exemple des flux à "courte distance" 
 #-------------------------------
 
 # 1) Calcul d'une matrice de distances
@@ -289,24 +289,93 @@ head(tab.distance)
 # critères de distance minimum ou de distance maximum
 
 Q1<-quantile(tab.distance$distance,0.25)   #25% des distances les plus courtes
+Q10<-quantile(tab.distance$distance,0.10)
+
+# On va utiliser le paramètre  "dmax" distance pour réduire la matrice
 
 tab.flow<-flowreduct(tabflow,
                      tab.distance,
                      metric = "continous",
                      d.criteria = "dmax", # critère de distance maximum parcourue 
-                     d = 5112934)            # valeur du critère Q1 : 5100 km
+                     d = 1498153)            # valeur du critère Q10 : 2500 km
 
-# Sélection des fij > 0
+# Sélection des seuls fij > 0
 
-
-flow.distQ1<-tab.flow %>%
+flow.distQ10<-tab.flow %>%
   select(i,j,flowfilter) %>%
   filter(flowfilter !=0)
 
-head(flow.distQ1)
+head(flow.distQ10)
 
 
 #3) cartographie des flux parcourant moins de 5100 km
+#----------------------------
+
+
+# les flux de moins de 
+
+
+source <- "United Nations, Department of Economic and Social Affairs, Population Division (2019)"
+authors <- "Françoise Bahoken & Nicolas Lambert, 2021"
+
+# Graphic parameters
+par(mar=c(0,0,1,0))
+
+sizes <- getFigDim(x = countries, width = 1500,mar = c(0,0,0,0), res = 150)
+png("maps/flow_2500km.png", width = sizes[1], height = sizes[2], res = 150)
+
+# Overlay a spatial background 
+par(bg = "NA")
+
+plot(st_geometry(countries), col=NA, border=NA)
+
+plot(st_geometry(bbox), col="#d5ebf2", border=NA, add=T)
+plot(st_geometry(graticule), col = "white",lwd=1, add=T)
+plot(st_geometry(countries), col="#e3d0c1", border = "white", add=T)
+plot(st_geometry(land), col=NA, border = "#317691", lwd = 1, add=T)
+
+x <- -16300000 ; y <- 12250000
+
+
+# Flowmap : flow travelled less than  (Q1)
+
+head(flow.distQ10)
+
+flowmap(tab=flow.distQ10,
+        fij="flowfilter",origin.f = "i",destination.f = "j",
+        bkg = map,code="adm0_a3_is",nodes.X="X",nodes.Y = "Y",
+        filter=TRUE,
+        taille=8,           
+        a.head = 1,  #fleche
+        a.length = 0.11,
+        a.col="#f7714f",
+        add=TRUE)
+
+#Map legend
+
+legendPropLines(pos="bottomright",
+                title.txt="Nombre de migrants\n(distance parcourue inférieure à 2500 km)",
+                title.cex=0.8,    
+                cex=0.5,
+                values.cex= 0.7,  
+                var=c(min(flow.distQ10$flowfilter),2500), 
+                col="#f7714f",
+                lwd=8,
+                frame = FALSE,
+                values.rnd = 0
+)
+
+#Map cosmetic
+
+layoutLayer(title = " Flux ayant parcouru moins de 2500 km",
+            author <- authors,
+            sources <- source,
+            tabtitle = T,
+            frame = TRUE,
+            col = "#636363") # coltitle ="#636363"
+
+
+dev.off()
 
 
 
@@ -316,40 +385,5 @@ head(flow.distQ1)
 #------------------------------------------
 
 
-#----------------------------
-# Map Template
-#----------------------------
 
-col = "#9F204280"
-credit = paste0("Françoise Bahoken & Nicolas Lambert, 2021\n",
-                "Source: United Nations, Department of Economic\n",
-                "and Social Affairs, Population Division (2019)")
-theme = mf_theme(x = "default", bg = "white", tab = FALSE, 
-                 pos = "center", line = 2, inner = FALSE, 
-                 fg = "#9F204270", mar = c(0,0, 2, 0),cex = 1.9)
-template = function(title, file){
-  mf_export(
-    countries,
-    export = "png",
-    width = 1000,
-    filename = file,
-    res = 96,
-    theme = theme, 
-    expandBB = c(-.02,0,-.02,0)
-  )
-  mf_map(bbox, col = "#d5ebf2",border = NA, lwd = 0.5, add = TRUE)
-  mf_map(graticule, col = "white", lwd = 0.5, add = TRUE)
-  mf_map(countries, col = "#baaba2",border = "white", lwd = 0.5, add = TRUE)
-  mf_map(land, col = NA,border = "#317691", lwd = 0.5, add = TRUE)
-  # mf_map(links, col = NA,border = "#317691", lwd = 0.5, add = TRUE)
-  mf_credits(
-    txt = credit,
-    pos = "bottomright",
-    col = "#1a2640",
-    cex = 0.7,
-    font = 3,
-    bg = "#ffffff30"
-  )
-  mf_title(title)
-}
-            
+
