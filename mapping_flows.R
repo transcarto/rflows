@@ -257,6 +257,15 @@ dev.off()
 # Exemple des flux à "courte distance" 
 #-------------------------------
 
+# flowdist() calcule une matrice de distance à partir d'un fond de carte
+# flowreduct() réduit la matrice de flux en fonction d'une matrice de distance
+# metric : type de matrice (continuous ou ordinal) 
+# d.criteria : critère de fitrage au-dessus/en-dessous
+# d.criteria : dmin -> critère fixant la distance minimale à parcourir
+# d.criteria : dmax -> critère fixant la distance maximale à parcourir
+# d.: valeur du critère de distance min/max
+
+
 # 1) Calcul d'une matrice de distances
 #---------------------------
 
@@ -376,8 +385,10 @@ layoutLayer(title = " Flux ayant parcouru moins de 2500 km",
 dev.off()
 
 
-#4) cartographie des flux parcourant au moins 150000 km
-#----------------------------
+#-------------------------------
+# Map 4 : Migrations filtrées sur la distance
+# Exemple des flux à "longue distance" 
+#-------------------------------
 
 # choix du critère
 
@@ -461,6 +472,22 @@ layoutLayer(title = " Flux ayant parcouru plus de 13000 km",
 
 
 dev.off()
+
+
+#-------------------------------
+# Map 5 : Migrations filtrées selon le voisinage
+# k contiguités
+#-------------------------------
+
+# flowcontig()` créé une matrice de k contiguités à partir d'un fond de carte
+# background: fond de carte
+# code: les ID
+# k: un nombre k (k:1,2,...,k)de limites de zones entre OD. 
+# Si k=1, les OD partagent une limite de zone
+
+
+
+
 
 
 #------------------------------------------
