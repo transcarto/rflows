@@ -1,5 +1,5 @@
 #----------------------------
-# DATA HANDLING : COMPUTE SEVERAL TYPES OF MATRIX
+# DATA HANDLING : COMPUTE SEVERAL TYPES OF MATRIX FROM ONE MATRICE
 # Computes bilateral flows (Fij) and marginal (on i) flow indicators
 #----------------------------
 
@@ -71,7 +71,6 @@ tabflow$fij<-as.numeric(tabflow$fij)
 # (2) Compute Gross and net flows as Tobler's 
 #----------------------------
 
-
 # Compute bilateral flow volum : FSij
 flow_vol<-flowtype(tabflow, origin ="i",destination="j",fij="Fij", 
                    format="L",x="bivolum")
@@ -81,15 +80,11 @@ flow_net<-flowtype(tabflow, origin ="i",destination="j",fij="Fij",
                    format="L", x="bibal")
 
 
-
-
 # (3) Compute asymmetry of bilateral flows : FAij
 #----------------------------
 
 flow_asy<-flowtype(tabflow, origin ="i",destination="j",fij="Fij", 
                    format="L", x="biasym")
-
-
 
 #suppress NA cells due to zero division (eg for flow_asy)
 
