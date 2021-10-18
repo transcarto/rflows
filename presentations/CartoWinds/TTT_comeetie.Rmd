@@ -1,5 +1,5 @@
 ---
-title: "<span style='color:#777777'>Session TTT </span></br><span style='background-color:#333333;color:#ffffff;font-size:0.7em'> Création et visualisation de champs vectoriels pour l’analyse de matrice Origine-Destination</span>"
+title: "<span style='color:#777777'>Transcarto</span></br><span style='background-color:#333333;color:#ffffff;font-size:0.7em'> Création et visualisation de champs vectoriels pour l’analyse de matrice Origine-Destination</span>"
 author: Etienne Côme @comeetie
 output:
   revealjs::revealjs_presentation:
@@ -8,7 +8,7 @@ output:
     highlight: pygments
     includes:
       in_header: in_header.html
-date: 15 Juin 2021
+date: 19 Octobre 2021
 ---
 
 ```{r setup, include=FALSE}
@@ -109,7 +109,7 @@ $$\color{blue}{D}.\color{red}{A}=\color{green}{\Delta}$$
 avec :
 
 - $\color{blue}{D}$ matrice modélisant l'influence des distances $D_{ij}=-\frac{1}{dist(i,j)}$ et $D_{kk}=\sum_{i,i\neq k}\frac{1}{dist(i,k)}$, 
-- $\color{blue}{A}$ le vecteur d'actravité recherché 
+- $\color{red}{A}$ le vecteur d'attractivité recherché 
 - $\color{green}{\Delta}$ le vecteur de balance $\Delta_{k}=\sum_iM_{ik} - \sum_jM_{kj}$. 
  
 Solution **unique** à un facteur additif près.  
@@ -121,7 +121,7 @@ Solution **unique** à un facteur additif près.
 
 ## Construction d'un champ continu
 
-Même modèle, même hypothèse mais les déplacements ne peuvent se faire qu'entre noeuds voisins positionnés sur une grille régulière :
+Même modèle, même hypothèses mais les déplacements ne peuvent se faire qu'entre nœuds voisins positionnés sur une grille régulière :
 
 <img src="tobdelta.png"></img>
 
@@ -134,20 +134,20 @@ On obtient pour chaque noeuds 4 équations reliant les flux aux attractivités :
 
 ## Construction d'un champ continu
 
-Qui une fois combinées lient les $\Delta$ aux attractivités :
+Qui une fois combinées lient les $\color{green}{\Delta}$ aux attractivités :
 
 <img src="tob_final.png"></img>
 
 et forment un système d'équation linéaire avec des liens fort avec la physique (équation de poisson).
 
-Rmq : Manque juste les equations au bord du domaine qui encoderont le fait que le système est clos (pas de fuites)
+<b>Rmq :</b> Manque juste les équations au bord du domaine qui encoderont le fait que le système est clos (pas de fuites)
 
 
 ## Construction d'un champ continu
 
-Pour utiliser cette approche il suffit d'affecter un $\Delta$ à chaque noeuds de la grille. 
+Pour utiliser cette approche il suffit d'affecter un $\color{green}{\Delta}$ à chaque nœuds de la grille. 
 
-Solution proposée par Tobler avec des données spatiales zonales affectation uniforme (ou pondéré) des $\Delta$ :
+Solution proposée par <i>Tobler</i> avec des données spatiales zonales affectation uniforme (ou pondéré) des $\color{green}{\Delta}$ :
 
 <img src="grille.jpg"></img>
 
@@ -156,8 +156,8 @@ Solution proposée par Tobler avec des données spatiales zonales affectation un
 En résumé :
 
 - *Rasteriser* les polygones sur une grille régulière, 
-- i.e. affecter à chaque noeuds de la grille le $\Delta$ du polygone qui le contient pondéré par le nombre de noeud à l'interieur du polygone
-- Résoudre l'équation de poisson pour obtennir le champ potentiel i.e. *l'attracivité* de chaque noeud
+- i.e. affecter à chaque nœud de la grille le $\color{green}{\Delta}$ du polygone qui le contient pondéré par le nombre de nœud à l'interieur du polygone
+- Résoudre l'équation de poisson pour obtenir le champ potentiel i.e. *l'attracivité* de chaque nœud
 - Calculer le champs vectoriel en différenciant l'attractivité 
 
 ## Exemple historique
@@ -275,10 +275,10 @@ Confession, j'ai longtemps admirer earth.nullschool.net :
 
 Recette :
 
-- lacher quelques centaine de **particules** dans le champs,
+- lâcher quelques centaine de **particules** dans le champs,
 - à chaque pas de temps faire **évoluer leurs positions** suivant le champ
-- mettre à jour la visualition avec les nouvelles positions 
-- en gardant la visualisation précédente mais en **l'atténuant** pour créer un effet de trainée
+- mettre à jour la visualisation avec les nouvelles positions 
+- en gardant la visualisation précédente mais en **l'atténuant** pour créer un effet de traînée
 - à partir d'un certains temps **ré-initialiser** la position de la particule de manière aléatoire
 
 ## Wind
@@ -288,7 +288,7 @@ Recette :
 
 - Territoire continu *quid des îles* 
 - Pas de fuites ?
-- Utilisation uniquement des $\Delta$
+- Utilisation uniquement des $\color{green}{\Delta}$
 - *Neutralité* de la représentation ? 
 - Légende à la fois inutile et *importante*
 
